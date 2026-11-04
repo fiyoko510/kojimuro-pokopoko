@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>こうじむろ ぽこぽこ</title>
+<meta name="description" content="ちょいちょい育てる 麹のおせわゲーム。温度を見て、ダマをほぐして、カビ菌をおいはらう。遊びながら麹のしくみがわかる癒しゲーム。">
+<meta name="theme-color" content="#3cb8c8">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:title" content="こうじむろ ぽこぽこ">
+<meta property="og:description" content="ちょいちょい育てる 麹のおせわゲーム。遊びながら麹のしくみがわかる癒しゲーム。">
+<meta property="og:url" content="https://fiyoko510.github.io/kojimuro-pokopoko/">
+<meta property="og:image" content="https://fiyoko510.github.io/kojimuro-pokopoko/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f9fb;--ink:#24365c;--teal:#3cb8c8;--warm:#f6a96b;--hot:#e86b5a;--cold:#7fa9d6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",sans-serif;user-select:none;-webkit-user-select:none}
+#app{max-width:480px;margin:0 auto;padding:10px 12px 18px}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:18px;margin:0;font-weight:900}
+h1 small{display:block;font-size:10px;font-weight:500;opacity:.6}
+.chip{white-space:nowrap;border:0;background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:700;color:var(--ink);box-shadow:0 1px 0 #d9e9ee}
+.card{background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 1px 0 #d9e9ee;margin-top:8px}
+#trayWrap{position:relative;margin-top:8px}
+#tray{display:block;width:100%;border-radius:16px;touch-action:manipulation}
+#bubble{position:relative;margin:0 0 10px auto;width:86%;height:52px;display:flex;align-items:center;background:#fff;border-radius:14px;padding:6px 12px;font-size:12px;font-weight:700;line-height:1.5;box-shadow:0 2px 8px rgba(36,54,92,.12)}
+#bubble:after{content:"";position:absolute;right:38px;bottom:-12px;border:6px solid transparent;border-top-color:#fff}
+.row{display:flex;align-items:center;gap:8px}
+.lbl{font-size:11px;font-weight:700;opacity:.65;min-width:46px}
+.bar{position:relative;flex:1;height:12px;border-radius:8px;background:#edf5f7;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .4s,background .4s}
+#zone{position:absolute;top:0;bottom:0;background:rgba(60,184,200,.2)}
+#tval{font-weight:900;font-size:16px;min-width:62px;text-align:right}
+#gval,#qval{font-weight:900;font-size:13px;min-width:62px;text-align:right}
+.meta{font-size:11px;opacity:.7;margin-top:6px;line-height:1.5}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.b{border:0;border-radius:14px;padding:11px 6px;font:inherit;font-weight:900;font-size:15px;color:var(--ink);background:#fff;box-shadow:0 3px 0 #cfe3e8}
+.b small{display:block;font-size:10px;font-weight:500;opacity:.75}
+.b:active{transform:translateY(2px);box-shadow:none}
+.b.teal{background:var(--teal);color:#fff;box-shadow:0 3px 0 #2a8e9b}
+.b.wide{grid-column:1/3}
+.b:disabled{opacity:.5}
+.b.on{background:#fff6e8;box-shadow:0 3px 0 #f0c98f,inset 0 0 0 2px #f6a96b}
+.b.alert{animation:pulse 1s infinite;background:#fff3ef;box-shadow:0 3px 0 #f2b3a3,inset 0 0 0 2px var(--hot)}
+@keyframes pulse{50%{transform:scale(1.03)}}
+#mg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px auto 0;max-width:270px}
+.big[hidden]{display:none}
+.hole{position:relative;aspect-ratio:1;border-radius:50%;background:radial-gradient(#d9bf91 40%,#c9a56f);overflow:hidden;box-shadow:inset 0 6px 10px rgba(0,0,0,.15)}
+.hole canvas{position:absolute;left:0;top:100%;width:100%;height:100%;transition:top .18s}
+.hole.up canvas{top:8%}
+/* mini mode: small window in a corner */
+body.mini #app{padding:6px 8px 8px}
+body.mini h1{display:none}body.mini header{justify-content:flex-end}
+body.mini #toast{font-size:11px;padding:6px 10px;top:6px}
+html,body{overflow-x:hidden}
+body.mini .chip{padding:3px 8px;font-size:11px}
+body.mini #bubble{height:38px;font-size:11px;line-height:1.35;padding:4px 10px;margin-bottom:7px;width:92%}
+body.mini #bubble:after{right:26px}
+body.mini #trayWrap{margin-top:4px}
+body.mini .card{padding:6px 10px;margin-top:6px}
+body.mini .qrow,body.mini #meta{display:none}
+body.mini .row+.row{margin-top:4px!important}
+body.mini #tval{font-size:13px}
+body.mini .btns{margin-top:6px;gap:6px}
+body.mini .b{padding:6px 4px;font-size:13px}body.mini .b small{display:none}
+body.mini #ff,body.mini #sw{display:none!important}
+#ff{display:block;margin:12px auto 0;border:0;background:none;font:inherit;font-size:11px;color:var(--ink);opacity:.5;text-decoration:underline}
+.ov{position:fixed;inset:0;background:rgba(243,249,251,.95);display:flex;align-items:center;justify-content:center;z-index:10;padding:14px}
+.ov[hidden]{display:none}
+.sheet{background:#fff;border-radius:20px;max-width:420px;width:100%;padding:16px;box-shadow:0 8px 30px rgba(36,54,92,.12);max-height:94vh;overflow:auto}
+.sheet h2{margin:0 0 6px;font-size:19px;font-weight:900}
+.sheet p,.sheet li{font-size:13px;line-height:1.7}
+.sheet ul{padding-left:1.1em;margin:6px 0}
+.tip{background:#f3f9fb;border-radius:12px;padding:8px 10px;margin:6px 0;font-size:12px;line-height:1.6}
+.tip.locked{opacity:.45}
+.pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.pick button{border:0;border-radius:14px;background:#f3f9fb;padding:10px 4px;font:inherit;font-weight:900;font-size:14px;color:var(--ink);box-shadow:0 3px 0 #d3e5ea}
+.pick button small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:2px}
+.pick canvas{display:block;margin:0 auto 4px}
+#toast{position:fixed;left:50%;top:12px;transform:translate(-50%,-10px);width:min(440px,92vw);background:#fff;border-radius:14px;padding:9px 12px;font-size:12px;line-height:1.6;box-shadow:0 6px 18px rgba(36,54,92,.18);opacity:0;transition:.3s;pointer-events:none;z-index:30}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast b{color:var(--teal)}
+/* puzzle */
+#pz .sheet{padding:12px}
+#pzHead{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px;gap:6px;flex-wrap:wrap}#pzInfo{font-size:12px}
+#pzCv{display:block;margin:8px auto 0;touch-action:none;border-radius:14px}
+.big{display:block;width:100%;border:0;border-radius:14px;padding:12px;font:inherit;font-weight:900;font-size:15px;color:#fff;background:var(--teal);box-shadow:0 3px 0 #2a8e9b;margin-top:10px}
+.big.ghost{background:#eef6f8;color:var(--ink);box-shadow:0 3px 0 #d3e5ea}
+.row2{display:flex;align-items:center;gap:10px;background:#f3f9fb;border-radius:14px;padding:8px 10px;margin:6px 0}
+.row2 .ic{font-size:28px;width:36px;text-align:center}
+.row2 .tx{flex:1;font-size:12px;line-height:1.5}
+.row2 .tx b{font-size:14px}
+.row2 button{border:0;border-radius:12px;padding:8px 10px;font:inherit;font-weight:900;font-size:13px;color:#fff;background:var(--teal);box-shadow:0 2px 0 #2a8e9b;white-space:nowrap}
+.row2 button:disabled{background:#c9dde1;box-shadow:none}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:6px}
+.tc{position:relative;aspect-ratio:2/3.3;border-radius:10px;padding:5px;color:#f6e7bf;text-align:center;cursor:pointer;
+  background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 3px 8px rgba(36,54,92,.25);display:flex;flex-direction:column;align-items:center;overflow:hidden}
+.tc:before{content:"";position:absolute;inset:4px;border:1.5px solid #d9b56a;border-radius:7px;pointer-events:none}
+.tc:after{content:"";position:absolute;inset:7px;border:.8px solid rgba(217,181,106,.55);border-radius:5px;pointer-events:none}
+.tc.koji{--c1:#1f5d63;--c2:#0f3238}
+.tc.item{--c1:#3b2f63;--c2:#1c1736}
+.tc .tn{font-family:Georgia,serif;font-size:10px;letter-spacing:.1em;margin-top:6px;color:#e8c77c}
+.tc .arch{flex:1;width:72%;margin:4px 0;border:1.2px solid #d9b56a;border-radius:999px 999px 6px 6px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%,rgba(255,236,180,.35),rgba(255,236,180,0) 70%)}
+.tc .arch span{font-size:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.tc .tname{font-size:12px;font-weight:900;color:#fff4d6}
+.tc .tsub{font-family:Georgia,serif;font-size:6.5px;letter-spacing:.12em;opacity:.8;margin-bottom:8px}
+.tc .cnt{position:absolute;right:6px;top:6px;background:#e8c77c;color:#2a2148;border-radius:999px;font-size:9px;font-weight:900;padding:1px 5px;z-index:1}
+.tc.back{--c1:#2a3555;--c2:#151b30;cursor:default}
+.tc .bk{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:repeating-linear-gradient(45deg,rgba(217,181,106,.12) 0 6px,transparent 6px 12px);border-radius:6px}
+.tc .bk span{color:#d9b56a;font-size:14px}.tc .bk b{color:#d9b56a;font-size:22px;font-family:Georgia,serif}.tc .bk small{font-size:9px;opacity:.6}
+.tc.big{width:170px;margin:0 auto;cursor:default}
+.tc.big .tn{font-size:14px;margin-top:10px}.tc.big .arch span{font-size:64px}.tc.big .tname{font-size:20px}.tc.big .tsub{font-size:10px;margin-bottom:14px}
+.flipin .tc{animation:flip .8s ease-out}
+@keyframes flip{0%{transform:perspective(600px) rotateY(180deg) scale(.7);opacity:0}60%{opacity:1}100%{transform:perspective(600px) rotateY(0) scale(1)}}
+#madeOv{z-index:12}
+.sec{font-size:12px;font-weight:900;opacity:.6;margin:12px 0 2px}
+.col{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.col span{background:#f3f9fb;border-radius:10px;padding:4px 8px;font-size:12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>こうじむろ ぽこぽこ<small>ちょいちょい育てる 麹のおせわ</small></h1>
+    <div style="display:flex;gap:6px"><button class="chip" id="friend" style="color:#e57d9a">♡0</button><button class="chip" id="seasonBtn"></button><button class="chip" id="colBtn">🏺</button><button class="chip" id="noteBtn">📖</button></div>
+  </header>
+
+  <div id="trayWrap">
+    <div id="bubble">…</div>
+    <canvas id="tray"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="row"><span class="lbl">温度</span><div class="bar"><div id="zone"></div><i id="tbar"></i></div><span id="tval">--</span></div>
+    <div class="row" style="margin-top:7px"><span class="lbl">育ち</span><div class="bar"><i id="gbar" style="background:var(--teal)"></i></div><span id="gval">--</span></div>
+    <div class="row qrow" style="margin-top:7px"><span class="lbl">できばえ</span><div style="flex:1;font-size:15px;letter-spacing:2px" id="stars"></div><span id="qval"></span></div>
+    <div class="meta" id="meta"></div>
+  </div>
+
+  <div class="btns">
+    <button class="b" id="clothBtn">🧺 布をかける<small>保温する</small></button>
+    <button class="b teal" id="pzBtn">🍚 ごはんパズル<small>栄養をあげる</small></button>
+  </div>
+  <button id="ff">⏩ 試作用：1時間すすめる</button>
+  <button id="sw" style="display:block;margin:4px auto 0;border:0;background:none;font:inherit;font-size:11px;color:var(--ink);opacity:.5;text-decoration:underline">🔄 試作用：季節をかえる</button>
+</div>
+
+<div id="toast"></div>
+
+<!-- new batch -->
+<div class="ov" id="newOv" hidden>
+  <div class="sheet">
+    <h2>🌾 麹をしこもう</h2>
+    <p>麹室で、こうじちゃんを育てよう。アプリを閉じていても、麹は時間とともに育っていくよ。</p>
+    <ul>
+      <li>ときどき開いて<b>温度</b>を見てね。32〜40℃がごきげん。</li>
+      <li>麹菌は育つと<b>自分で熱を出す</b>よ。麹に<b>ダマ</b>ができたら、<b>光った順番</b>にタップしてほぐしてね（手入れ）。</li>
+      <li>寒いときは「<b>布をかける</b>」で保温。</li>
+            <li>大きい<b>こうじちゃんをタップ</b>すると、麹のまめちしきを話してくれるよ（なかよし度も上がるよ）。</li>
+      <li>ふわふわ漂う小さいこうじちゃんは<b>2回タップでなでなで</b>。なかよし度が上がるとお話が増えるよ。</li>
+      <li>開くたびに<b>ちっちゃいカビ菌</b>が漂ってくるよ。タップでおいはらってね。</li>
+      <li><b>季節</b>で室温やカビ菌の来やすさが変わるよ（冬は寒い、夏はじめじめ）。</li>
+      <li>遊びたいときは<b>ごはんパズル</b>で栄養をあげると早く育つよ。</li>
+    </ul>
+    <p style="font-weight:900;margin-bottom:0">どの原料でしこむ？</p>
+    <div class="pick" id="pick"></div>
+    <p style="font-size:11px;opacity:.6;margin:8px 0 0">いまの試作品は、約10時間でひとつ完成するよ。データはこの端末のブラウザに保存されるよ。</p>
+  </div>
+</div>
+
+<!-- done -->
+<div class="ov" id="doneOv" hidden>
+  <div class="sheet">
+    <h2 id="doneTitle"></h2>
+    <p id="doneTxt"></p>
+    <div class="tip" id="doneUse"></div>
+    <button class="big" id="doneNext">つぎの麹をしこむ</button>
+  </div>
+</div>
+
+<!-- note -->
+<div class="ov" id="noteOv" hidden>
+  <div class="sheet">
+    <h2>📖 麹のまめちしきノート</h2>
+    <p style="font-size:12px;opacity:.7;margin-top:0">お世話をしているとページが増えていくよ。</p>
+    <div id="noteList"></div>
+    <button class="big" data-close>とじる</button>
+  </div>
+</div>
+
+<!-- shop -->
+<div class="ov" id="shopOv" hidden>
+  <div class="sheet">
+    <h2>💗 ハートこうかん所</h2>
+    <p style="font-size:12px;margin-top:0">もっているハート <b id="shopHearts" style="color:#e57d9a"></b>　<span style="opacity:.6">（ちびこうじちゃんを2回タップでもらえるよ）</span></p>
+    <div id="shopList"></div>
+    <p style="font-size:11px;opacity:.7;margin:8px 0 0">🏺 しこんだものはカードになって、<b>麹だな</b>にかざられるよ。</p>
+    <button class="big ghost" id="danceBtn">🎉 ダンスをもう一回見る</button>
+    <button class="big" data-close>とじる</button>
+  </div>
+</div>
+<div class="ov" id="madeOv" hidden>
+  <div class="sheet" style="text-align:center">
+    <div id="madeIcon" class="flipin"></div>
+    <h2 id="madeTitle"></h2>
+    <div class="tip" id="madeTxt" style="text-align:left"></div>
+    <button class="big" data-close>やったね！</button>
+  </div>
+</div>
+
+<!-- collection -->
+<div class="ov" id="colOv" hidden>
+  <div class="sheet">
+    <h2>🏺 麹だな</h2>
+    <div id="colList"></div>
+    <button class="big" data-close>とじる</button>
+  </div>
+</div>
+
+<!-- puzzle -->
+<div class="ov" id="pz" hidden>
+  <div class="sheet">
+    <div id="pzHead"><span>🍚 ごはんパズル</span><span id="pzInfo"></span></div>
+    <div style="font-size:11px;opacity:.7;margin-top:4px">となりと入れかえて、同じ原料を<b>たてか横に一列で3つ以上</b>ならべてね（L字や斜めは消えないよ）。落ちてこないから、ゆっくりで大丈夫。</div>
+    <canvas id="pzCv"></canvas>
+    <button class="big ghost" id="pzQuit">ここでやめる（そこまでの栄養をあげる）</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+const RICE=1,WHEAT=2,BEAN=3;
+const TYPES=[RICE,WHEAT,BEAN];
+const KOJI={1:{n:'米麹',raw:'お米',use:'甘酒・米みそ・塩麹などに使われるよ。'},2:{n:'麦麹',raw:'麦',use:'麦みそや麦焼酎などに使われるよ。'},3:{n:'豆麹',raw:'大豆',use:'豆みそ（愛知の八丁みそなど）に使われるよ。'},4:{n:'黒麹',raw:'お米',use:'焼酎や泡盛に使われるよ。クエン酸をたくさん出すから、暑い土地でも雑菌に強いんだ。'}};
+const KURO=4;
+const LO=32,HI=40,DUR=10;
+const SEASONS={
+ spring:{n:'春',e:'🌸',room:20,k:.35,mold:1,  msg:'ぽかぽか陽気。麹づくりしやすい季節だよ。'},
+ summer:{n:'夏',e:'🌻',room:30,k:.5, mold:2.2,msg:'暑くてじめじめ。熱がこもりやすく、カビ菌も来やすいよ。'},
+ autumn:{n:'秋',e:'🍁',room:22,k:.35,mold:.8, msg:'すずしくておだやか。はじめは布で保温してあげてね。'},
+ winter:{n:'冬',e:'❄️',room:12,k:.35,mold:.5, msg:'ひえこむ季節。布で保温しないと麹がねむっちゃうよ。'}};
+const SKEYS=['spring','summer','autumn','winter'];
+function seasonKey(){if(S&&S.sOverride)return S.sOverride;const m=new Date().getMonth()+1;return m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter'}
+const SE=()=>SEASONS[seasonKey()];
+let ROOM=22; // hours to finish in ideal temp
+const TIPS=[
+ {id:'name',t:'麹菌の正式な名前は<b>ニホンコウジカビ</b>（アスペルギルス・オリゼ）。日本の「国菌」にも選ばれているよ。'},
+ {id:'eat',t:'麹菌は<b>米・麦・豆</b>などの原料にふくまれる栄養をとりこんで、活動を始めるよ。'},
+ {id:'heat',t:'麹菌が生きて<b>呼吸</b>し、栄養を分解・変化させる（<b>代謝</b>）ときに熱が生まれるよ。'},
+ {id:'peak',t:'麹菌がぐんぐん育つ時期は、活動がさかんで<b>熱がいちばんこもりやすい</b>よ。'},
+ {id:'hot',t:'熱がこもると温度が上がりすぎてしまう。本物の麹づくりでは、温度を確認しながら、必要に応じて麹を<b>ほぐす・混ぜる</b>（手入れ）よ。ゲームでは<b>布をとる</b>と熱がにげるよ。'},
+ {id:'hogusu',t:'ほぐすと、かたまりの中にこもった熱と湿気がにげて、空気も入るよ。麹菌は空気（酸素）を使って呼吸しているんだ。'},
+ {id:'cold',t:'温度が低すぎると、麹菌はのんびりモード。育ちがゆっくりになるよ。'},
+ {id:'cloth',t:'本物の麹づくりでは、<b>布をかけて保温</b>したり、麹を山のように<b>盛って</b>熱をためたりもするよ。'},
+ {id:'mold',t:'麹づくりでは、ほかの<b>雑菌やカビ</b>が入らないよう、道具や手を清潔にして温度・湿度を整えることが大切だよ。'},
+ {id:'hyphae',t:'麹菌は<b>菌糸</b>という細い糸をのばして育つよ。菌糸が粒の中までしみこむことを「<b>はぜこみ</b>」というよ。'},
+ {id:'enzyme',t:'麹菌は<b>酵素</b>をつくるよ。でんぷんを糖に変えて甘みを、たんぱく質をアミノ酸に変えてうまみを生むんだ。'},
+ {id:'time',t:'本物の麹づくりは<b>約2日</b>かかるよ。そのあいだ何度も温度を見て、ほぐしたり広げたりの手入れをするんだ（このゲームでは約10時間に短くしてあるよ）。'},
+ {id:'quality',t:'麹は発酵の過程で熱を出すけれど、<b>発熱だけで品質を判断することはできない</b>よ。見た目や香りもたいせつ。'},
+ {id:'kinds',t:'原料によって<b>米麹・麦麹・豆麹</b>ができるよ。それぞれ米みそ・麦みそ・豆みそのもとになるんだ。'},
+ {id:'s_spring',t:'春や秋は気温がおだやかで、麹づくりがしやすい季節だよ。'},
+ {id:'s_summer',t:'暑くて湿気の多い夏は、<b>雑菌やカビがふえやすい</b>季節。麹づくりではとくに温度と清潔さに気をつけるよ。'},
+ {id:'s_autumn',t:'秋は新米の季節。とれたてのお米で麹や甘酒をつくる楽しみもあるね。'},
+ {id:'s_winter',t:'寒い時期に味噌やお酒をしこむことを「<b>寒仕込み</b>」というよ。気温が低いと雑菌がふえにくいので、昔から仕込みにいい時期とされてきたんだ。'},
+ {id:'master',t:'白くふわふわの菌糸におおわれた麹は「<b>花が咲いた</b>」なんて表現されることも。'},
+];
+
+// ---------- save ----------
+let S;
+function load(){try{S=JSON.parse(localStorage.getItem('kojimuro2')||'null')}catch(e){S=null}
+  if(!S)S={batch:null,done:[],tips:[]};}
+function save(){try{localStorage.setItem('kojimuro2',JSON.stringify(S))}catch(e){}}
+load();
+if(S.hearts===undefined)S.hearts=S.friend||0;S.items=S.items||[];S.unlock=S.unlock||[];
+if(S.batch){if(S.batch.clump&&S.batch.clump.pos&&!S.batch.clump.order){S.batch.clump=null}
+if(S.batch.clump===true){S.batch.clump=null;S.batch.cd=Math.max(0,(S.batch.cd||1)-1)}S.batch.molds.forEach(m=>{if(m.x>.62&&m.y<.48)m.x=.12+Math.random()*.45});S.batch.shape='normal';S.batch.cd=S.batch.cd||0;if(S.batch.cd===0&&S.batch.g>.3)S.batch.cd=1;}
+const learned=()=>new Set(S.tips);
+
+// ---------- toast ----------
+const toastEl=document.getElementById('toast');let tq=[],tOn=false;
+function toast(html,id,ms=4800){
+  if(id){if(S.tips.includes(id))return;S.tips.push(id);save();html='📖 '+html}
+  tq.push({html,ms});if(!tOn)nextT();}
+function nextT(){const t=tq.shift();if(!t){tOn=false;toastEl.classList.remove('show');return}
+  tOn=true;toastEl.innerHTML=t.html;toastEl.classList.add('show');
+  setTimeout(()=>{toastEl.classList.remove('show');setTimeout(nextT,320)},t.ms);}
+
+// ---------- simulation ----------
+function mood(t){return t>HI?'hot':t<LO?'cold':'good'}
+function activity(g){return 0.3+1.4*Math.sin(Math.PI*Math.min(1,g))}
+function simStep(b,h){ // h hours
+  const a=activity(b.g);
+  const se=SE();ROOM=se.room;
+  const SH={mori:.55,normal:1,flat:1.6}[b.shape||'normal'];
+  let k=(b.covered?0.14:se.k)*SH;
+  if(b.clump)k*=.75;
+  b.temp+= (a*3.5 - k*(b.temp-ROOM))*h;
+  b.temp=Math.min(48,b.temp);
+  const m=mood(b.temp);
+  const rate=m==='good'?1:m==='cold'?(b.temp<28?0.15:0.45):(b.temp>44?0:0.3);
+  b.g=Math.min(1,b.g+rate*h/DUR);
+  if(b.temp>HI+1)b.q-= (b.temp>44?14:5)*h;
+  b.q-=b.molds.length*2.5*h;
+  b.q=Math.max(5,b.q);
+  if(m==='good')b.goodH+=h;
+  const pm=(m==='good'?0.05:0.3)*(b.covered&&m==='hot'?1.5:1)*se.mold*((b.cleanH||0)>0?.15:1)*(b.type===KURO?.5:1);
+  b.cleanH=Math.max(0,(b.cleanH||0)-h);
+  const CL=[.28,.52,.74];
+  if(!b.clump&&(b.cd||0)<3&&b.g>=CL[b.cd||0])makeClump(b,true);
+  if(!b.clump&&b.temp>HI+1){b.hotH=(b.hotH||0)+h;if(b.hotH>.3)makeClump(b,false)}else if(!b.clump)b.hotH=0;
+  if(b.clump){b.clumpH+=h;if(b.clumpH>1.5)b.q-=3*h}
+  if(b.molds.length<5&&Math.random()<pm*h)addMold(b);
+  b.sat=Math.max(0,b.sat-h);
+}
+function makeClump(b,timing){
+  const n=5+Math.floor(Math.random()*2),pos=[];let tries=0,md=.16;
+  while(pos.length<n){if(++tries%400===0)md*=.9;const x=.12+Math.random()*.68,y=.2+Math.random()*.7;if(x>.62&&y<.48)continue;
+    if(pos.every(p=>Math.hypot(p.x-x,(p.y-y)*.68)>md))pos.push({x,y,r:Math.random()*3})}
+  b.clump={id:Date.now(),timing,pos,order:[...Array(n).keys()].sort(()=>Math.random()-.5),step:0};b.clumpH=0;b.hotH=0}
+function safeXY(x,y){if(x>.62&&y<.48)x=.12+Math.random()*.45;return[x,y]}
+function addMold(b){const [x,y]=safeXY(.12+Math.random()*.76,.22+Math.random()*.66);b.molds.push({x,y,s:Math.random()*6})}
+function catchUp(){
+  const b=S.batch;if(!b)return null;
+  const now=Date.now();let h=(now-b.last)/3.6e6;b.last=now;
+  if(h<0.02)return null;
+  h=Math.min(h,48);
+  const before={temp:b.temp,g:b.g,m:b.molds.length,q:b.q};
+  for(let t=0;t<h;t+=0.05)simStep(b,Math.min(0.05,h-t));
+  save();
+  return {h,before};
+}
+function report(r){
+  if(!r||r.h<0.25)return;
+  const b=S.batch;
+  const hh=r.h>=1?Math.floor(r.h)+'時間'+(Math.round((r.h%1)*60)?Math.round((r.h%1)*60)+'分':''):Math.round(r.h*60)+'分';
+  let s=`留守のあいだに<b>${hh}</b>たったよ。温度 ${r.before.temp.toFixed(1)}→<b>${b.temp.toFixed(1)}℃</b>、育ち ${Math.floor(r.before.g*100)}→<b>${Math.floor(b.g*100)}%</b>`;
+  const dm=b.molds.length-r.before.m;if(dm>0)s+=`。<b style="color:#6f8f6a">カビ菌が${dm}こ</b>来てる！`;
+  toast(s,null,5200);
+}
+
+// ---------- canvas ----------
+const cv=document.getElementById('tray'),cx=cv.getContext('2d');
+let W=360,H=240,DPR=Math.min(2,devicePixelRatio||1);
+function resize(){const mini=document.body.classList.toggle('mini',innerHeight<560||innerWidth<380);
+  W=cv.parentElement.clientWidth;if(mini)W=Math.min(W,Math.max(200,(innerHeight-150)/0.68));H=Math.round(W*0.68);cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.style.width=W+'px';cv.style.margin='0 auto';kPos=null;cx.setTransform(DPR,0,0,DPR,0,0);grains=null}
+window.addEventListener('resize',resize);
+let grains=null;
+function seeded(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647}
+function makeGrains(){
+  const b=S.batch;const r=seeded(b?b.start:1);grains=[];
+  const tx=W*.07,ty=H*.2,tw=W*.86,th=H*.72;
+  const n=b&&b.type===BEAN?138:234;
+  for(let i=0;i<n;i++)grains.push({x:tx+r()*tw,y:ty+r()*th,a:r()*Math.PI,o:r()*0.5,s:.8+r()*.4});
+  grains.sort((p,q)=>p.y-q.y);
+}
+function grain(c,t,x,y,s,a){
+  if(t===KURO)t=RICE;
+  c.save();c.translate(x,y);c.rotate(a);
+  if(t===RICE){c.fillStyle='#fffdf4';c.strokeStyle='#dccfb0';c.lineWidth=1;c.beginPath();c.ellipse(0,0,7*s,4.6*s,0,0,7);c.fill();c.stroke()}
+  else if(t===WHEAT){c.fillStyle='#f0c25e';c.strokeStyle='#c8963a';c.lineWidth=1;c.beginPath();c.ellipse(0,0,6.5*s,4.4*s,0,0,7);c.fill();c.stroke();c.strokeStyle='rgba(160,110,40,.45)';c.beginPath();c.moveTo(-5*s,0);c.lineTo(5*s,0);c.stroke()}
+  else{c.fillStyle='#e2b066';c.strokeStyle='#b07f3a';c.lineWidth=1;c.beginPath();c.arc(0,0,7*s,0,7);c.fill();c.stroke()}
+  c.restore();
+}
+function fluffLite(x,y,r,col='#fffefb'){cx.fillStyle=col;cx.beginPath();for(let i=0;i<7;i++){const a=i/7*Math.PI*2;cx.moveTo(x+Math.cos(a)*r*.72+r*.32,y+Math.sin(a)*r*.72);cx.arc(x+Math.cos(a)*r*.72,y+Math.sin(a)*r*.72,r*.32,0,7)}cx.moveTo(x+r*.75,y);cx.arc(x,y,r*.75,0,7);cx.fill()}
+function fluffy(c,x,y,r,col='#fff',edge='#e8dcc8'){
+  c.fillStyle=edge;for(let i=0;i<14;i++){const a=i/14*Math.PI*2;c.beginPath();c.arc(x+Math.cos(a)*r*.8,y+Math.sin(a)*r*.8,r*.32,0,7);c.fill()}
+  c.fillStyle=col;for(let i=0;i<14;i++){const a=i/14*Math.PI*2;c.beginPath();c.arc(x+Math.cos(a)*r*.76,y+Math.sin(a)*r*.76,r*.27,0,7);c.fill()}
+  c.beginPath();c.arc(x,y,r*.8,0,7);c.fill();
+}
+function face(c,x,y,r,m){
+  c.fillStyle=c.strokeStyle='#2b3a5c';c.lineCap='round';c.lineWidth=Math.max(1,r*.08);
+  const ex=r*.32,ey=y-r*.05,er=Math.max(1.2,r*.09);
+  if(m==='cold'||m==='joy'){c.beginPath();c.arc(x-ex,ey,er*1.3,Math.PI*1.1,Math.PI*1.9);c.stroke();c.beginPath();c.arc(x+ex,ey,er*1.3,Math.PI*1.1,Math.PI*1.9);c.stroke()}
+  else{c.beginPath();c.arc(x-ex,ey,er,0,7);c.arc(x+ex,ey,er,0,7);c.fill()}
+  if(m==='joy'){c.fillStyle='#c0505a';c.beginPath();c.arc(x,y+r*.15,r*.2,0,Math.PI);c.fill();c.fillStyle='rgba(240,140,140,.6)';c.beginPath();c.arc(x-r*.55,y+r*.15,r*.14,0,7);c.arc(x+r*.55,y+r*.15,r*.14,0,7);c.fill();return}
+  c.beginPath();if(m==='sad'||m==='hot')c.arc(x,y+r*.32,r*.14,Math.PI*1.15,Math.PI*1.85);else c.arc(x,y+r*.12,r*.14,Math.PI*.15,Math.PI*.85);c.stroke();
+  if(m!=='sad'){c.fillStyle='rgba(240,140,140,.45)';c.beginPath();c.arc(x-r*.55,y+r*.15,r*.12,0,7);c.arc(x+r*.55,y+r*.15,r*.12,0,7);c.fill()}
+}
+function moldDraw(c,x,y,r,t){
+  c.fillStyle='#8faa8a';for(let i=0;i<10;i++){const a=i/10*Math.PI*2+t*.3;c.beginPath();c.arc(x+Math.cos(a)*r*.62,y+Math.sin(a)*r*.62,r*.36,0,7);c.fill()}
+  c.fillStyle='#a3bc9e';c.beginPath();c.arc(x,y,r*.72,0,7);c.fill();face(c,x,y+r*.05,r*.8,'sad');
+}
+let specialUntil=0,specialPat=0,floats=[],tinies=[],landAcc=0,waveAcc=0,nextWave=180,parts=[],kPos=null,kHop=0,talkUntil=0,lastTalk=-1;
+function draw(){
+  const t=performance.now()/1000,b=S.batch;
+  cx.clearRect(0,0,W,H);
+  // wooden tray
+  cx.fillStyle='#e9cf9f';rr(0,0,W,H,16);cx.fill();
+  cx.fillStyle='#f6e6c6';rr(8,8,W-16,H-16,11);cx.fill();
+  if(!b){draw2(t);return}
+  if(!grains)makeGrains();
+  const m=mood(b.temp);
+  const shf={mori:.55,normal:1,flat:1.12}[b.shape||'normal'],ox=W*.47,oy=H*.58;
+  if(b.shape==='mori'){const gd=cx.createRadialGradient(ox,oy,10,ox,oy,W*.32);gd.addColorStop(0,'rgba(190,150,90,.35)');gd.addColorStop(1,'rgba(190,150,90,0)');cx.fillStyle=gd;cx.beginPath();cx.ellipse(ox,oy,W*.34,H*.32,0,0,7);cx.fill()}
+  const sp=Date.now()<specialUntil,amp=sp?10:9;
+  grains.forEach(g0=>{let gx=ox+(g0.x-ox)*shf,gy=oy+(g0.y-oy)*shf;
+    if(sp){const dx=gx-ox,dy=gy-oy,d=Math.hypot(dx,dy)||1,w=Math.sin(d*.045-t*2.6)*amp;gx+=dx/d*w;gy+=dy/d*w}
+    else{gx+=Math.sin(t*.9+g0.y*.035)*amp;gy+=Math.cos(t*.75+g0.x*.03)*amp*.7}
+    const gr={...g0,x:gx,y:gy,a:g0.a+Math.sin(t*.6+g0.o*9)*.6};grain(cx,b.type,gr.x,gr.y,gr.s,gr.a);
+    const cov=Math.max(0,Math.min(1,(b.g*1.5-gr.o)));
+    if(cov>0){cx.globalAlpha=cov*.92;fluffLite(gr.x,gr.y,(5+cov*4)*gr.s,b.type===KURO?'#4a4a55':'#fffefb');cx.globalAlpha=1}});
+  if(b.g>.85){cx.fillStyle=`rgba(255,255,255,${(b.g-.85)*2.4})`;rr(8,8,W-16,H-16,11);cx.fill()}
+  // steam
+  if(b.temp>37){const n=b.temp>HI?5:2;cx.strokeStyle=m==='hot'?'rgba(232,107,90,.55)':'rgba(246,169,107,.45)';cx.lineWidth=2.2;
+    for(let i=0;i<n;i++){const x=W*(.18+.16*i),y0=H*.95-((t*22+i*37)%(H*.5));cx.beginPath();cx.moveTo(x,y0);cx.quadraticCurveTo(x+7,y0-9,x,y0-18);cx.quadraticCurveTo(x-7,y0-27,x,y0-36);cx.stroke()}}
+  // cloth
+  if(b.covered){cx.save();cx.globalAlpha=.6;cx.fillStyle='#f4efe6';rr(4,4,W-8,H-8,14);cx.fill();
+    cx.strokeStyle='rgba(180,160,130,.5)';cx.lineWidth=2;for(let i=1;i<6;i++){cx.beginPath();cx.moveTo(W*i/6,10);cx.quadraticCurveTo(W*i/6+10,H/2,W*i/6-4,H-10);cx.stroke()}
+    cx.restore()}
+  // koji-chan
+  const r=W*(.075+b.g*.05),kx=W-r-18,ky=r+18+Math.sin(t*2)*2-kHop*10;
+  kPos={x:kx,y:ky,r};
+  if(b.g>.15){cx.strokeStyle='rgba(205,195,175,.8)';cx.lineWidth=1.4;const n=6+Math.floor(b.g*10);
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2+t*.1,L=r*(1.15+b.g*.4);cx.beginPath();cx.moveTo(kx+Math.cos(a)*r*.7,ky+Math.sin(a)*r*.7);cx.quadraticCurveTo(kx+Math.cos(a+.3)*L*.9,ky+Math.sin(a+.3)*L*.9,kx+Math.cos(a)*L,ky+Math.sin(a)*L);cx.stroke()}}
+  fluffy(cx,kx,ky,r,m==='hot'?'#fff1ea':m==='cold'?'#eef5ff':'#fffdf8',m==='hot'?'#f4c1ad':'#e8dcc8');
+  face(cx,kx,ky+3,r*.7,b.molds.length?'sad':m);
+  if(m==='cold'){cx.fillStyle='#24365c';cx.font='bold 13px sans-serif';cx.fillText('z',kx+r*.8,ky-r*.5);cx.font='bold 10px sans-serif';cx.fillText('z',kx+r*.8+9,ky-r*.5-9)}
+  if(m==='hot'){cx.fillStyle='#7cc7e8';const sx=kx-r*.8,sy=ky-r*.4;cx.beginPath();cx.moveTo(sx,sy-7);cx.quadraticCurveTo(sx+6,sy+2,sx,sy+4);cx.quadraticCurveTo(sx-6,sy+2,sx,sy-7);cx.fill()}
+  // molds (drawn on top so they never hide behind koji-chan)
+  b.molds.forEach(md=>moldDraw(cx,md.x*W,md.y*H+Math.sin(t*2+md.s)*1.5,Math.max(13,W*.045),t+md.s));
+  drawFloats(t,b);
+  drawClumps(b);
+  draw2(t);
+}
+let demoId=0,demoT=0,flash={},failT=0;
+function startDemo(){const b=S.batch;if(!b||!b.clump)return;b.clump.step=0;demoId=b.clump.id;demoT=performance.now()+700;flash={};
+  toast('✨ ダマが光るよ。<b>光った順番</b>に、おなじようにタップしてほぐしてね',null,2600)}
+function demoIdx(now,b){if(demoId!==b.clump.id)return -2;const e=now-demoT;if(e<0)return -1;const k=Math.floor(e/750);if(k>=b.clump.order.length){return 99}
+  return (e%750)<520?b.clump.order[k]:-1}
+function drawClumps(b){
+  if(!b.clump)return;const now=performance.now();
+  if(demoId!==b.clump.id)startDemo();
+  const di=demoIdx(now,b);
+  b.clump.pos.forEach((p,i)=>{const wob=now<failT?Math.sin(now/30)*3:0;
+    const x=p.x*W+wob,y=p.y*H,lit=di===i||(flash[i]&&now<flash[i]);
+    const P=[];for(let k=0;k<10;k++){const a=k/10*Math.PI*2,rr=(lit?29:26)+Math.sin(k*2.3+p.r)*4;P.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr*.78])}
+    if(lit){cx.save();cx.shadowColor='rgba(255,200,90,.95)';cx.shadowBlur=22}
+    cx.fillStyle=lit?'#ffe7a8':'rgba(255,252,244,.95)';cx.strokeStyle=lit?'#f2b84b':'rgba(200,170,120,.9)';cx.lineWidth=lit?3:2;
+    cx.beginPath();for(let k=0;k<10;k++){const A=P[k],B=P[(k+1)%10];const mx=(A[0]+B[0])/2,my=(A[1]+B[1])/2;if(k===0)cx.moveTo((P[9][0]+A[0])/2,(P[9][1]+A[1])/2);cx.quadraticCurveTo(A[0],A[1],mx,my)}
+    cx.closePath();cx.fill();cx.stroke();if(lit)cx.restore();
+    cx.fillStyle='rgba(200,160,100,.35)';[[-8,-4],[6,-6],[-2,6],[9,5]].forEach(([a,c])=>{cx.beginPath();cx.ellipse(x+a,y+c,5,3.2,a,0,7);cx.fill()});
+  });
+}
+function drawFloats(t,b){
+  const spNow=Date.now()<specialUntil,want=spNow?12:3+Math.floor(b.g*6),fr=Math.max(10,W*.036);
+  if(!spNow&&floats.some(f=>f.tmp))floats=floats.filter(f=>!f.tmp);
+  while(floats.length<want)floats.push({tmp:spNow,x:W*(.15+Math.random()*.6),y:H*(.3+Math.random()*.6),vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.25,ph:Math.random()*6,smile:0,lastTap:0,wig:0});
+  const now=Date.now();
+  const sp=now<specialUntil,n=floats.length,ccx=W*.45,ccy=H*.55,R=Math.min(W,H)*.32;
+  if(sp&&Math.random()<.15)parts.push({x:Math.random()*W,y:Math.random()*H,vx:0,vy:-.4,l:1,k:'spark'});
+  floats.forEach((f,i)=>{
+    if(sp){const ph=t*.7+i*Math.PI*2/n;let tx,ty;
+      const P=specialPat,u=i/n;
+      if(P===0){tx=ccx+Math.cos(ph)*R;ty=ccy+Math.sin(ph)*R*.8}
+      else if(P===1){tx=ccx+Math.sin(ph)*R*1.3;ty=ccy+Math.sin(ph*2)*R*.55}
+      else if(P===2){const v=(u+t*.05)%1;tx=W*(.1+.8*v);ty=ccy+Math.sin(tx*.025+t*2)*H*.18}
+      else if(P===3){const a=ph,hx=16*Math.pow(Math.sin(a),3),hy=13*Math.cos(a)-5*Math.cos(2*a)-2*Math.cos(3*a)-Math.cos(4*a);tx=ccx+hx*R/17;ty=ccy-hy*R/17*.85}
+      else if(P===4){const k=(t*.15+u)%1*5,s0=Math.floor(k),fr=k-s0,pt=j=>{const a=-Math.PI/2+j*Math.PI*4/5;return[ccx+Math.cos(a)*R,ccy+Math.sin(a)*R*.85]},A=pt(s0),B=pt(s0+1);tx=A[0]+(B[0]-A[0])*fr;ty=A[1]+(B[1]-A[1])*fr}
+      else if(P===5){tx=W*(.15+.7*(n>1?i/(n-1):.5));ty=ccy+R*.4-Math.abs(Math.sin(t*3+i*.7))*R*.9}
+      else if(P===6){const rr=R*(.25+.75*(.5+.5*Math.sin(t*.9+i*.6)));tx=ccx+Math.cos(ph*1.4)*rr;ty=ccy+Math.sin(ph*1.4)*rr*.8}
+      else if(P===7){const a=ph*.6,rr=R*Math.cos(3*a);tx=ccx+Math.cos(a)*rr*1.1;ty=ccy+Math.sin(a)*rr*.85}
+      else if(P===8){const v=(u+t*.06)%1;tx=W*(.1+.8*v);ty=ccy+((Math.floor(v*8)%2?1:-1)*(v*8%1-.5)*2)*R*.5}
+      else{const inner=i%2===0,a=inner?ph:-ph;const rr=inner?R*.45:R;tx=ccx+Math.cos(a)*rr;ty=ccy+Math.sin(a)*rr*.8}
+      f.x+=(tx-f.x)*.08;f.y+=(ty-f.y)*.08;f.smile=Math.max(f.smile,now+400)}
+    else{f.x+=f.vx*.6+Math.sin(t*.6+f.ph)*.12;f.y+=f.vy*.6+Math.cos(t*.5+f.ph)*.1;}
+    if(f.x<fr+10||f.x>W-fr-10)f.vx*=-1;if(f.y<fr+10||f.y>H-fr-10)f.vy*=-1;
+    f.x=Math.max(fr+10,Math.min(W-fr-10,f.x));f.y=Math.max(fr+10,Math.min(H-fr-10,f.y));
+    const sm=now<f.smile,w=now<f.wig?Math.sin(now/40)*2:0;
+    cx.globalAlpha=.95;fluffy(cx,f.x+w,f.y,fr*(sm?1.12:1));cx.globalAlpha=1;
+    face(cx,f.x+w,f.y+2,fr*.72,sm?'joy':'good');});
+  // molds keep arriving in waves while the app is open
+  waveAcc+=1/60;
+  if(waveAcc>nextWave&&tinies.length<25){waveAcc=0;const se=SE();nextWave=(150+Math.random()*60)/Math.sqrt(Math.max(.6,se.mold));
+    const n=2+Math.floor(Math.random()*3*Math.max(1,se.mold));
+    for(let i=0;i<n;i++){const side=Math.floor(Math.random()*4);
+      tinies.push({x:side===0?14:side===1?W-14:W*Math.random(),y:side===2?14:side===3?H-14:H*Math.random(),vx:(Math.random()-.5)*1,vy:(Math.random()-.5)*.8,ph:Math.random()*6,sz:.7+Math.random()*.6})}
+    toast(`🦠 カビ菌が${n}ぴきやってきた！`,null,1600)}
+  const tr=Math.max(11,W*.036);
+  tinies.forEach(m=>{m.x+=m.vx*.35+Math.sin(t*.7+m.ph)*.1;m.y+=m.vy*.35+Math.cos(t*.6+m.ph)*.08;
+    if(m.x<tr+8||m.x>W-tr-8)m.vx*=-1;if(m.y<tr+8||m.y>H-tr-8)m.vy*=-1;
+    moldDraw(cx,m.x,m.y,tr*(m.sz||1),t+m.ph)});
+  // tiny molds slowly land on the koji
+  if(tinies.length){landAcc+=1/60;if(landAcc>150){landAcc=0;const m=tinies.pop();
+    if(b.molds.length<5){const [x,y]=safeXY(m.x/W,m.y/H);b.molds.push({x,y,s:m.ph});save();toast('🦠 ちっちゃいカビ菌が麹にくっついちゃった！タップでとってね',null,2800);ui()}}}
+}
+const DANCES=['輪になってくるくるおどる','8の字にくるくるおどる','波になってゆらゆらおどる','ハートの形になる','星の形をなぞる','ならんでぴょんぴょんジャンプする','らせんみたいにぐるぐるする','お花の形になる','ジグザグに行進する','二重の輪で反対まわりにおどる'];
+function startSpecial(announce){specialPat=(Math.floor((S.friend||0)/10)+9)%10;specialUntil=Date.now()+10000;
+  if(announce)toast(`🎉 なかよし度<b>＋10</b>！ こうじちゃんたちが${DANCES[specialPat]}よ`,null,3500)}
+function spawnTinies(){const se=SE();const n=Math.round(Math.min(30,Math.max(10,20*se.mold)));
+  tinies=[];for(let i=0;i<n;i++)tinies.push({x:W*(.1+Math.random()*.8),y:H*(.1+Math.random()*.8),vx:(Math.random()-.5)*.8,vy:(Math.random()-.5)*.6,ph:Math.random()*6,sz:.7+Math.random()*.6});
+  landAcc=0;waveAcc=0;toast(`🦠 ちっちゃいカビ菌が${n}ぴき、ただよってるよ！タップしておいはらおう`,null,3000)}
+function draw2(t){
+  kHop=Math.max(0,kHop-.05);
+  drawSeason(t);
+  parts=parts.filter(p=>(p.l-=.02)>0);
+  parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;cx.globalAlpha=p.l;
+    if(p.k==='spark'){cx.fillStyle='#bfe9f0';cx.font='12px sans-serif';cx.fillText('✦',p.x,p.y)}
+    else if(p.k==='heart'){cx.fillStyle='#ef7f9e';cx.font='bold 15px sans-serif';cx.fillText('♥',p.x,p.y)}
+    else if(p.k==='air'){cx.strokeStyle='rgba(120,200,215,.9)';cx.lineWidth=2;cx.beginPath();cx.arc(p.x,p.y,4,0,7);cx.stroke()}
+    else{cx.fillStyle='#9fb99a';cx.beginPath();cx.arc(p.x,p.y,3,0,7);cx.fill()}});
+  cx.globalAlpha=1;
+}
+function rr(x,y,w,h,r){cx.beginPath();cx.roundRect?cx.roundRect(x,y,w,h,r):cx.rect(x,y,w,h)}
+
+// ---------- ui ----------
+const $=id=>document.getElementById(id);
+function ui(){
+  const b=S.batch;
+  if(!b){$('bubble').textContent='なにをしこむ？';return}
+  const m=mood(b.temp);
+  const pct=v=>Math.max(0,Math.min(100,(v-20)/(50-20)*100));
+  $('zone').style.left=pct(LO)+'%';$('zone').style.width=(pct(HI)-pct(LO))+'%';
+  $('tbar').style.width=pct(b.temp)+'%';$('tbar').style.background=m==='hot'?'var(--hot)':m==='cold'?'var(--cold)':'var(--warm)';
+  $('tval').textContent=b.temp.toFixed(1)+'℃';$('tval').style.color=m==='hot'?'var(--hot)':m==='cold'?'var(--cold)':'';
+  $('gbar').style.width=(b.g*100)+'%';$('gval').textContent=Math.floor(b.g*100)+'%';
+  const st=Math.max(1,Math.round(b.q/20));$('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='#f2b84b';
+  const el=(Date.now()-b.start)/3.6e6;
+  const left=(1-b.g)*DUR;
+  $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;
+  const say=b.clump?'ダマができた〜 光った順にタップしてほぐして〜':b.molds.length?'なにかいる…！タップでとって〜':m==='hot'?(b.covered?'あつい〜布とって〜':'あつい〜もうすぐダマになりそう…'):m==='cold'?(b.covered?'ぬくぬく待ち…':'ちょっとさむい…布かけて'):b.g<.3?'菌糸、のばしてるよ':b.g<.7?'ぐんぐん育ちちゅう！':'もうすぐ麹の花がさくよ';
+  if(Date.now()>talkUntil)$('bubble').textContent=say;
+  $('clothBtn').innerHTML=b.covered?'🧺 布をとる<small>熱をこもらせない</small>':'🧺 布をかける<small>保温する</small>';
+  $('friend').textContent='♡'+(S.hearts||0);
+  // contextual tips
+  if(m==='hot')toast(TIPS[4].t,'hot');
+  if(m==='cold'&&b.g<.3)toast(TIPS[6].t,'cold');
+  if(b.g>.3)toast(TIPS[9].t,'hyphae');
+  if(b.g>.35&&activity(b.g)>1.3)toast(TIPS[3].t,'peak');
+  if(b.g>.55)toast(TIPS[10].t,'enzyme');
+  if(b.g>.7)toast(TIPS[11].t,'time');
+  if(b.molds.length)toast(TIPS[8].t,'mold');
+  if(b.g>=1)finish();
+}
+
+// ---------- actions ----------
+let last=Date.now();
+function tick(){
+  const b=S.batch;
+  if(b&&!pzOn){const now=Date.now();const h=(now-b.last)/3.6e6;if(h>0.002){simStep(b,h);b.last=now;save()}}
+}
+function tapClump(px,py){
+  const b=S.batch;if(!b||!b.clump)return false;
+  const i=b.clump.pos.findIndex(p=>Math.hypot(p.x*W-px,(p.y*H-py)/.78)<32);if(i<0)return false;
+  const now=performance.now(),di=demoIdx(now,b);
+  if(di!==99){if(di!==-2)toast('光るのを見ててね👀',null,1200);return true}
+  flash[i]=now+300;
+  if(b.clump.order[b.clump.step]===i){b.clump.step++;
+    for(let k=0;k<5;k++)parts.push({x:b.clump.pos[i].x*W,y:b.clump.pos[i].y*H,vx:(Math.random()-.5)*2,vy:-1-Math.random(),l:1,k:'air'});
+    if(b.clump.step>=b.clump.order.length){b.clump.pos.forEach(p=>{for(let k=0;k<8;k++)parts.push({x:p.x*W,y:p.y*H,vx:(Math.random()-.5)*3,vy:-1-Math.random()*1.5,l:1,k:'air'})});finishClump(b)}}
+  else{failT=now+500;b.clump.step=0;toast('あれ、ちがったみたい。もう一回光るから見ててね',null,2000);setTimeout(()=>{demoId=0},900)}
+  save();ui();return true}
+function finishClump(b){const m=mood(b.temp),timing=b.clump.timing;b.clump=null;
+  for(let i=0;i<18;i++)parts.push({x:W*(.1+Math.random()*.8),y:H*(.4+Math.random()*.5),vx:(Math.random()-.5)*.6,vy:-1-Math.random()*1.2,l:1,k:'air'});
+  if(timing){b.cd=(b.cd||0)+1;b.q=Math.min(100,b.q+6);b.temp=Math.max(ROOM+1,b.temp-(m==='hot'?5:2.5));
+    const nm=['切り返し','仲仕事','仕舞仕事'][b.cd-1];
+    toast(`✨ ナイス手入れ！ かたまりがほぐれて、空気が入ったよ。できばえアップ（本物の麹づくりでいう「${nm}」みたいな作業だよ）`,null,4500);
+    toast(TIPS[5].t,'hogusu');toast('本物の麹づくりでも、ほぐす手入れは約2日のあいだに<b>2〜4回くらい</b>。育ち具合を見てタイミングよく行うよ。','teire');}
+  else{b.temp=Math.max(ROOM+1,b.temp-4);toast('✨ 熱でできたダマをほぐして、熱をにがしたよ',null,2500);toast(TIPS[4].t,'hot')}
+}
+$('clothBtn').onclick=()=>{const b=S.batch;if(!b)return;b.covered=!b.covered;save();if(b.covered)toast(TIPS[7].t,'cloth');ui()};
+cv.addEventListener('pointerdown',e=>{
+  const b=S.batch;if(!b)return;const r=cv.getBoundingClientRect();const px=e.clientX-r.left,py=e.clientY-r.top;
+  if(tapClump(px,py))return;
+  // tiny molds
+  const tr=Math.max(11,W*.036)*1.8;
+  let ti=-1,bd=1e9;tinies.forEach((m,i)=>{const d=Math.hypot(m.x-px,m.y-py);if(d<tr&&d<bd){bd=d;ti=i}});
+  if(ti>=0){const m=tinies.splice(ti,1)[0];for(let k=0;k<8;k++)parts.push({x:m.x,y:m.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
+    if(!tinies.length){b.cleanH=Math.max(b.cleanH||0,2);save();toast('✨ ぜんぶおいはらった！しばらくカビ菌が来にくくなるよ',null,3000);toast(TIPS[8].t,'mold');ui()}
+    return}
+  // big molds
+  const R=Math.max(11,W*.04)*1.6;
+  const i=b.molds.findIndex(m=>Math.hypot(m.x*W-px,m.y*H-py)<R);
+  if(i>=0){const m=b.molds.splice(i,1)[0];for(let k=0;k<10;k++)parts.push({x:m.x*W,y:m.y*H,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
+    save();toast('カビ菌をとりのぞいたよ！',null,1800);ui();return}
+  // big koji-chan talks
+  if(kPos&&Math.hypot(px-kPos.x,py-kPos.y)<kPos.r*1.2){talk();return}
+  // floating koji: double tap to pet
+  const fr=Math.max(10,W*.036)*1.7;const now=Date.now();
+  const f=floats.find(f=>Math.hypot(f.x-px,f.y-py)<fr);
+  if(f){if(now-f.lastTap<450){f.smile=now+1800;f.lastTap=0;
+      for(let k=0;k<4;k++)parts.push({x:f.x+(Math.random()-.5)*20,y:f.y-12,vx:(Math.random()-.5)*1,vy:-1.2-Math.random(),l:1,k:'heart'});
+      addFriend();}
+    else{f.lastTap=now;f.wig=now+300}}
+});
+$('bubble').onclick=()=>{const b=S.batch;if(b&&b.clump){demoId=0}};
+$('ff').onclick=()=>{const b=S.batch;if(!b)return;b.last-=3.6e6;b.start-=3.6e6;report(catchUp());spawnTinies();ui()};
+
+// ---------- koji-chan talk ----------
+const TALK=[
+ '麹は和食の「うまみ」や「甘み」のもと。味噌・醤油・みりん・日本酒も、ぼくたちのおかげなんだ〜',
+ '米麹でつくる甘酒は、お酒じゃないからアルコールなし。子どもも飲めるよ',
+ '塩麹は、麹と塩と水をまぜて発酵させた調味料。お肉がやわらかくなるよ',
+ 'ぼくの胞子を集めたものを「種麹」っていうよ。種麹をつくる専門のお店「種麹屋さん」もあるんだ',
+ '「糀」っていう字もあるよ。お米に花が咲いたように見えるから、日本でつくられた字なんだって',
+ 'ぼくは空気が大好き。酸素で呼吸してるから、ほぐしてもらうと元気になるよ',
+ '2006年に、日本醸造学会が麹菌を「国菌」に選んだんだよ',
+ 'ぼく（ニホンコウジカビ）は、昔から長いあいだ安全に食べものづくりに使われてきたんだ',
+ '中国や韓国にも麹の文化があるよ。でも使うカビの種類がちがうこともあるんだ',
+ '甘酒は「飲む点滴」なんて呼ばれることもあるよ',
+ '醤油の麹は、大豆と小麦でつくるんだよ',
+ 'いい麹は、栗みたいな甘い香りがするって言われるよ',
+ '焼酎や泡盛には、黒麹や白麹っていう仲間が活躍してるよ',
+ 'でんぷんを糖に変える酵素を「アミラーゼ」っていうよ。甘酒が甘いのはそのおかげ',
+ 'たんぱく質をアミノ酸に変える酵素は「プロテアーゼ」。これがうまみのもとだよ',
+];
+function addFriend(){
+  const before=Math.min(TALK.length,5+Math.floor((S.friend||0)/5));S.friend=(S.friend||0)+1;S.hearts=(S.hearts||0)+1;save();
+  if(S.friend%10===0)startSpecial(true);
+  if(Math.min(TALK.length,5+Math.floor(S.friend/5))>before)toast('💬 こうじちゃんと仲よくなって、<b>新しいお話</b>が聞けるようになったよ。大きいこうじちゃんをタップしてみてね',null,4000);
+  ui()}
+function talk(){
+  addFriend();
+  const n=Math.min(TALK.length,5+Math.floor((S.friend||0)/5));
+  let i;do{i=Math.floor(Math.random()*n)}while(i===lastTalk&&n>1);lastTalk=i;
+  kHop=1;talkUntil=Date.now()+7000;
+  $('bubble').textContent=TALK[i];
+  for(let k=0;k<6;k++)parts.push({x:kPos.x+(Math.random()-.5)*kPos.r*2,y:kPos.y-kPos.r*.6,vx:(Math.random()-.5)*1.2,vy:-1-Math.random(),l:1,k:'heart'});
+}
+
+// ---------- new batch / finish ----------
+function pickUI(){
+  $('pick').innerHTML='';
+  const list=[...TYPES];if((S.unlock||[]).includes('kuro'))list.push(KURO);
+  $('pick').style.gridTemplateColumns=`repeat(${list.length},1fr)`;
+  list.forEach(t=>{const bt=document.createElement('button');const c=document.createElement('canvas');c.width=60;c.height=36;const g=c.getContext('2d');
+    [[18,18],[30,14],[42,20],[26,24],[38,26]].forEach(([x,y],i)=>grain(g,t,x,y,1,i));
+    bt.appendChild(c);bt.insertAdjacentHTML('beforeend',KOJI[t].n+`<small>${KOJI[t].raw}でつくる</small>`);
+    bt.onclick=()=>{S.batch={type:t,start:Date.now(),last:Date.now(),g:0,temp:30,q:100,covered:false,molds:[],goodH:0,sat:0,shape:'normal',cd:0,cleanH:0};save();grains=null;$('newOv').hidden=true;toast(TIPS[0].t,'name');toast(TIPS[1].t,'eat');setTimeout(spawnTinies,600);ui()};
+    $('pick').appendChild(bt)});
+}
+let finishing=false;
+function finish(){
+  if(finishing)return;finishing=true;
+  const b=S.batch;const st=Math.max(1,Math.round(b.q/20));
+  S.done.push({type:b.type,stars:st,date:Date.now()});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();
+  $('doneTitle').textContent=`🌸 ${KOJI[typ].n}ができた！`;
+  $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:16px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span><br>白い菌糸がふわふわに広がって、麹の花がさいたよ。`;
+  $('doneUse').innerHTML='🍶 '+KOJI[typ].use+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
+  toast(TIPS[14].t,'master');toast(TIPS[13].t,'kinds');toast(TIPS[12].t,'quality');
+  $('doneOv').hidden=false;
+}
+$('doneNext').onclick=()=>{$('doneOv').hidden=true;finishing=false;pickUI();$('newOv').hidden=false};
+
+// ---------- heart shop ----------
+const RECIPES=[
+ {id:'amazake',ic:'🍶',n:'甘酒',need:{1:1},cost:50,txt:'米麹とおかゆ（またはごはんと水）をまぜて、<b>55〜60℃くらいで6〜8時間</b>保温してつくるよ。米麹の甘酒はノンアルコール。'},
+ {id:'shio',ic:'🧂',n:'塩麹',need:{1:1},cost:50,txt:'米麹に塩と水をまぜて、<b>常温で1週間〜10日くらい</b>、毎日かきまぜて発酵させるよ。お肉や魚がやわらかく、うまみが増すんだ。'},
+ {id:'tamanegi',ic:'🧅',n:'玉ねぎ麹',need:{1:1},cost:80,txt:'すりおろした玉ねぎと米麹と塩をまぜて、<b>1週間くらい</b>発酵させるよ。コンソメみたいなうまみが出るって人気なんだ。'},
+ {id:'shoyukoji',ic:'🫙',n:'醤油麹',need:{1:1},cost:80,txt:'米麹を醤油に漬けて、<b>1週間〜10日くらい</b>発酵させるよ。ふつうの醤油よりまろやかで、うまみたっぷり。'},
+ {id:'komemiso',ic:'🥣',n:'米みそ',need:{1:1},cost:100,txt:'蒸した大豆をつぶして、<b>米麹と塩</b>をまぜて熟成させるよ。数か月〜1年くらいかけて、ゆっくり味が育つんだ。'},
+ {id:'mugimiso',ic:'🥣',n:'麦みそ',need:{2:1},cost:100,txt:'大豆に<b>麦麹と塩</b>をまぜて熟成させるよ。九州や中国・四国地方でよく食べられている、甘めで香りのいいみそ。'},
+ {id:'mamemiso',ic:'🟤',n:'豆みそ',need:{3:1},cost:100,txt:'<b>大豆を麹にした豆麹</b>と塩でつくるよ。愛知の八丁みそが有名で、1年以上じっくり熟成させるものもあるんだ。'},
+ {id:'shoyu',ic:'🫗',n:'醤油',need:{3:1,2:1},cost:150,txt:'醤油の麹は<b>大豆と小麦</b>でつくるよ。塩水とまぜた「もろみ」を、<b>半年〜1年以上</b>かけて熟成させてしぼるんだ。'},
+];
+const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+const EN={1:'KOME-KOJI',2:'MUGI-KOJI',3:'MAME-KOJI',4:'KURO-KOJI',amazake:'AMAZAKE',shio:'SHIO-KOJI',tamanegi:'TAMANEGI-KOJI',shoyukoji:'SHOYU-KOJI',komemiso:'KOME-MISO',mugimiso:'MUGI-MISO',mamemiso:'MAME-MISO',shoyu:'SHOYU'};
+function cards(){
+  const c=[];
+  [[1,'🌾'],[2,'🌿'],[3,'🫘'],[4,'⚫']].forEach(([t,ic])=>c.push({key:t,ic,n:KOJI[t].n,kind:'koji',own:S.done.filter(x=>x.type===t).length,txt:KOJI[t].use}));
+  RECIPES.forEach(r=>c.push({key:r.id,ic:r.ic,n:r.n,kind:'item',own:S.items.filter(x=>x===r.id).length,txt:r.txt}));
+  return c.map((x,i)=>({...x,no:ROMAN[i]}));
+}
+function cardHTML(c,big){
+  if(!c.own)return `<div class="tc back${big?' big':''}"><div class="bk"><span>✦</span><b>？</b><small>未発見</small></div></div>`;
+  return `<div class="tc ${c.kind}${big?' big':''}" data-k="${c.key}"><div class="tn">${c.no}</div><div class="arch"><span>${c.ic}</span></div><div class="tname">${c.n}</div><div class="tsub">${EN[c.key]}</div>${c.own>1&&!big?`<span class="cnt">×${c.own}</span>`:''}</div>`;
+}
+const UNLOCKS=[{id:'kuro',ic:'⚫',n:'黒麹菌',cost:200,txt:'黒い胞子の麹菌。焼酎や泡盛に使われるよ。クエン酸をたくさん出すから雑菌に強く、カビ菌が来にくいよ。'}];
+function stock(t){return S.done.filter(x=>x.type===t&&!x.used).length}
+function shopUI(){
+  $('shopHearts').textContent='♡'+(S.hearts||0);
+  let h='<div class="sec">🫙 麹をしこむ（麹だなの麹を使うよ）</div>';
+  h+=RECIPES.map(r=>{const needTxt=Object.entries(r.need).map(([t,n])=>`${KOJI[t].n}${n>1?'×'+n:''}`).join('＋');
+    const ok=(S.hearts||0)>=r.cost&&Object.entries(r.need).every(([t,n])=>stock(+t)>=n);
+    const made=S.items.filter(x=>x===r.id).length;
+    return `<div class="row2"><div class="ic">${r.ic}</div><div class="tx"><b>${r.n}</b>${made?` <span style="opacity:.6">（${made}こ）</span>`:''}<br>${needTxt}＋♡${r.cost}</div><button data-r="${r.id}" ${ok?'':'disabled'}>しこむ</button></div>`}).join('');
+  h+='<div class="sec">🌱 新しい麹菌</div>';
+  h+=UNLOCKS.map(u=>{const has=S.unlock.includes(u.id);return `<div class="row2"><div class="ic">${u.ic}</div><div class="tx"><b>${u.n}</b><br>${has?'こうかんずみ！次の仕込みで選べるよ':'♡'+u.cost}</div><button data-u="${u.id}" ${has||(S.hearts||0)<u.cost?'disabled':''}>${has?'もってる':'こうかん'}</button></div>`}).join('');
+  $('shopList').innerHTML=h;
+  $('shopList').querySelectorAll('[data-r]').forEach(bt=>bt.onclick=()=>craft(bt.dataset.r));
+  $('shopList').querySelectorAll('[data-u]').forEach(bt=>bt.onclick=()=>unlock(bt.dataset.u));
+}
+function craft(id){const r=RECIPES.find(x=>x.id===id);
+  Object.entries(r.need).forEach(([t,n])=>{for(let i=0;i<n;i++){const k=S.done.find(x=>x.type===+t&&!x.used);if(k)k.used=id}});
+  S.hearts-=r.cost;S.items.push(id);save();shopUI();ui();
+  const c=cards().find(x=>x.key===id);$('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=`${r.n}をしこんだよ！`;
+  $('madeTxt').innerHTML='📖 '+r.txt+'<br><br>🏺 カードは<b>麹だな</b>にかざったよ。右上の🏺からいつでも見られるよ。';$('madeOv').hidden=false}
+function unlock(id){const u=UNLOCKS.find(x=>x.id===id);S.hearts-=u.cost;S.unlock.push(id);save();shopUI();ui();
+  $('madeIcon').innerHTML=`<div style="font-size:54px">${u.ic}</div>`;$('madeTitle').textContent=`${u.n}をてにいれた！`;$('madeTxt').innerHTML='📖 '+u.txt+'<br>今の麹が完成したら、次の仕込みで選べるよ。';$('madeOv').hidden=false}
+$('friend').onclick=()=>{shopUI();$('danceBtn').hidden=(S.friend||0)<10;$('shopOv').hidden=false};
+$('danceBtn').onclick=()=>{$('shopOv').hidden=true;startSpecial(false)};
+
+// ---------- note & collection ----------
+$('noteBtn').onclick=()=>{const L=learned();$('noteList').innerHTML=TIPS.map((x,i)=>L.has(x.id)?`<div class="tip"><b>${i+1}.</b> ${x.t}</div>`:`<div class="tip locked"><b>${i+1}.</b> ？？？（お世話すると読めるよ）</div>`).join('')+`<p style="font-size:12px;text-align:right;margin:4px 0 0">${L.size} / ${TIPS.length} ページ</p>`;$('noteOv').hidden=false};
+$('colBtn').onclick=()=>{const d=S.done,cs=cards(),got=cs.filter(c=>c.own).length;
+  let h=`<div class="sec">🃏 麹カード　${got} / ${cs.length}</div><div class="tgrid">${cs.map(c=>cardHTML(c)).join('')}</div>`;
+  h+=`<div class="sec">🌾 しこみに使える麹</div><div class="col">${[...TYPES,KURO].filter(t=>t!==KURO||S.unlock.includes('kuro')).map(t=>`<span>${KOJI[t].n} × ${stock(t)}</span>`).join('')}</div>`;
+  h+=`<div class="sec">📜 育てた麹の記録</div>`+(d.length?d.slice().reverse().map(x=>`<div class="tip">${KOJI[x.type].n}　<span style="color:#f2b84b">${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)}</span>　<span style="opacity:.6">${new Date(x.date).toLocaleDateString('ja-JP')}${x.used?'・'+RECIPES.find(r=>r.id===x.used).n+'に':''}</span></div>`).join(''):'<p style="font-size:12px">まだないよ。最初の麹を育ててみよう！</p>');
+  $('colList').innerHTML=h;
+  $('colList').querySelectorAll('.tc[data-k]').forEach(el=>el.onclick=()=>{const c=cs.find(x=>String(x.key)===el.dataset.k);
+    $('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=c.n+(c.own>1?`（${c.own}まい）`:'');$('madeTxt').innerHTML='📖 '+c.txt;$('madeOv').hidden=false});
+  $('colOv').hidden=false};document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.ov').hidden=true);
+
+// ---------- puzzle (swap match-3, no falling pressure) ----------
+const N=6,MOVES=12;
+const pc=$('pzCv'),px=pc.getContext('2d');
+let pzOn=false,PG,pMoves,pEaten,pSel,pBusy,PS,pAnim=[],pDrag=null;
+function pdraw(t,x,y,s,al=1,sc=1){
+  px.save();px.globalAlpha=al;const r=s*.42*sc;
+  if(t===RICE){px.fillStyle='#fffdf6';px.strokeStyle='#d8ccb0';px.lineWidth=1.5;px.beginPath();px.ellipse(x,y,r*.95,r*.78,0,0,7);px.fill();px.stroke()}
+  else if(t===WHEAT){px.fillStyle='#f2c25c';px.strokeStyle='#c89434';px.lineWidth=1.5;px.beginPath();px.ellipse(x,y,r*.8,r*.95,0,0,7);px.fill();px.stroke()}
+  else{px.fillStyle='#e2b066';px.strokeStyle='#b07f3a';px.lineWidth=1.5;px.beginPath();px.arc(x,y,r*.9,0,7);px.fill();px.stroke()}
+  face(px,x,y+r*.05,r*.72,'good');px.restore();
+}
+function rndT(){return TYPES[Math.floor(Math.random()*3)]}
+function pInit(){
+  PG=[];for(let y=0;y<N;y++){PG.push([]);for(let x=0;x<N;x++){let t;do{t=rndT()}while((x>1&&PG[y][x-1]===t&&PG[y][x-2]===t)||(y>1&&PG[y-1][x]===t&&PG[y-2][x]===t));PG[y].push(t)}}
+  pOff=PG.map(r=>r.map(()=>0));
+}
+let pOff,pPop=null;
+function pMatches(){
+  const m=new Set();
+  for(let y=0;y<N;y++)for(let x=0;x<N-2;x++){const t=PG[y][x];if(t&&PG[y][x+1]===t&&PG[y][x+2]===t){let k=x;while(k<N&&PG[y][k]===t){m.add(y*N+k);k++}}}
+  for(let x=0;x<N;x++)for(let y=0;y<N-2;y++){const t=PG[y][x];if(t&&PG[y+1][x]===t&&PG[y+2][x]===t){let k=y;while(k<N&&PG[k][x]===t){m.add(k*N+x);k++}}}
+  return m;
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function pResolve(){
+  let chain=0;
+  while(true){
+    const m=pMatches();if(!m.size)break;chain++;
+    pPop={set:m,t0:performance.now()};await sleep(260);
+    pEaten+=m.size*(1+.5*(chain-1));
+    m.forEach(i=>PG[Math.floor(i/N)][i%N]=0);pPop=null;
+    for(let x=0;x<N;x++){let w=N-1;for(let y=N-1;y>=0;y--)if(PG[y][x]){if(w!==y){PG[w][x]=PG[y][x];PG[y][x]=0;pOff[w][x]=(w-y)}w--}
+      for(let y=w;y>=0;y--){PG[y][x]=rndT();pOff[y][x]=w+1}}
+    if(chain>=2)pInfo(`${chain}連鎖！`);
+    await sleep(240);
+  }
+}
+function pInfo(extra){$('pzInfo').innerHTML=`のこり <b>${pMoves}</b>手　栄養 <b>${Math.round(pEaten)}</b>`+(extra?`　<span style="color:var(--teal)">${extra}</span>`:'')}
+async function pSwap(a,b){
+  if(pBusy||pMoves<=0)return;pBusy=true;
+  const [ax,ay]=a,[bx,by]=b;
+  const sw=()=>{const t=PG[ay][ax];PG[ay][ax]=PG[by][bx];PG[by][bx]=t};
+  sw();
+  if(!pMatches().size){pSwapAnim={a,b,t0:performance.now()};await sleep(160);sw();pSwapAnim=null;pBusy=false;return}
+  pMoves--;pInfo();await pResolve();pInfo();pBusy=false;
+  if(pMoves<=0){await sleep(300);pEnd()}
+}
+let pSwapAnim=null;
+function pRender(){
+  if(!pzOn)return;
+  const s=PS;px.clearRect(0,0,N*s,N*s);
+  px.fillStyle='#f6e6c6';px.fillRect(0,0,N*s,N*s);
+  px.fillStyle='rgba(180,140,90,.12)';for(let y=0;y<N;y++)for(let x=0;x<N;x++)if((x+y)%2)px.fillRect(x*s,y*s,s,s);
+  const now=performance.now();
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const t=PG[y][x];if(!t)continue;
+    pOff[y][x]=Math.max(0,pOff[y][x]-0.25);
+    let dx=0,dy=-pOff[y][x]*s;
+    let al=1,sc=1;
+    if(pPop&&pPop.set.has(y*N+x)){const k=Math.min(1,(now-pPop.t0)/260);al=1-k;sc=1+k*.35}
+    if(pSel&&pSel[0]===x&&pSel[1]===y){px.fillStyle='rgba(60,184,200,.25)';px.fillRect(x*s,y*s,s,s);sc*=1.08}
+    pdraw(t,(x+.5)*s+dx,(y+.5)*s+dy,s,al,sc);
+    if(pPop&&pPop.set.has(y*N+x)){px.globalAlpha=1-al;fluffy(px,(x+.5)*s,(y+.5)*s,s*.3*(1-al));px.globalAlpha=1}
+  }
+  requestAnimationFrame(pRender);
+}
+function pCell(e){const r=pc.getBoundingClientRect();return[Math.floor((e.clientX-r.left)/PS),Math.floor((e.clientY-r.top)/PS)]}
+pc.addEventListener('pointerdown',e=>{if(pBusy)return;const c=pCell(e);pDrag={c,x:e.clientX,y:e.clientY,done:false}});
+pc.addEventListener('pointermove',e=>{if(!pDrag||pDrag.done)return;const dx=e.clientX-pDrag.x,dy=e.clientY-pDrag.y;
+  if(Math.hypot(dx,dy)>PS*.4){const [x,y]=pDrag.c;const d=Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)];const n=[x+d[0],y+d[1]];
+    if(n[0]>=0&&n[0]<N&&n[1]>=0&&n[1]<N){pDrag.done=true;pSel=null;pSwap([x,y],n)}}});
+pc.addEventListener('pointerup',e=>{if(!pDrag)return;if(!pDrag.done){const c=pDrag.c;
+  if(pSel&&Math.abs(pSel[0]-c[0])+Math.abs(pSel[1]-c[1])===1){const a=pSel;pSel=null;pSwap(a,c)}
+  else pSel=(pSel&&pSel[0]===c[0]&&pSel[1]===c[1])?null:c}
+  pDrag=null});
+$('pzBtn').onclick=()=>{
+  if(!S.batch)return;
+  PS=Math.floor(Math.min(innerWidth-56,400)/N);pc.width=N*PS*DPR;pc.height=N*PS*DPR;pc.style.width=N*PS+'px';pc.style.height=N*PS+'px';px.setTransform(DPR,0,0,DPR,0,0);
+  pInit();pMoves=MOVES;pEaten=0;pSel=null;pBusy=false;pzOn=true;pInfo();$('pz').hidden=false;requestAnimationFrame(pRender);
+};
+$('pzQuit').onclick=()=>{if(!pBusy)pEnd()};
+function pEnd(){
+  pzOn=false;$('pz').hidden=true;
+  const b=S.batch;if(!b)return;
+  b.last=Date.now();
+  const f=1/(1+b.sat);
+  const n=pEaten*f;
+  const dg=Math.min(.08,n*.0005)*(f<.9?f:1),dt=Math.min(3,.8+n*.006)*f;
+  b.g=Math.min(1,b.g+dg);b.temp=Math.min(46,b.temp+dt);b.sat+=1;save();
+  let s=`こうじちゃんが栄養をパクパク！育ち <b>+${(dg*100).toFixed(1)}%</b>、呼吸と代謝で温度 <b>+${dt.toFixed(1)}℃</b>`;
+  if(f<.9)s+='（ちょっとおなかいっぱいみたい）';
+  toast(s,null,4200);toast(TIPS[2].t,'heat');ui();
+}
+
+// ---------- season ----------
+let seasonFx=[];
+function seasonUI(first){
+  const k=seasonKey(),se=SEASONS[k];ROOM=se.room;
+  $('seasonBtn').textContent=se.e+' '+se.n;
+  seasonFx=[];
+  if(first!==false&&S.lastSeason!==k){S.lastSeason=k;save();toast(`${se.e} いまは<b>${se.n}</b>。${se.msg}`,null,4500)}
+  const tip=TIPS.find(x=>x.id==='s_'+k);toast(tip.t,tip.id);
+}
+$('seasonBtn').onclick=()=>{const se=SE();toast(`${se.e} <b>${se.n}</b>：${se.msg}<br>室温 約${se.room}℃`,null,4000)};
+$('sw').onclick=()=>{const i=(SKEYS.indexOf(seasonKey())+1)%4;S.sOverride=SKEYS[i];save();seasonUI();ui()};
+function drawSeason(t){
+  const k=seasonKey();
+  if(seasonFx.length<(k==='summer'?6:12))seasonFx.push({x:Math.random()*W,y:-10,v:.3+Math.random()*.5,s:Math.random()*6,r:Math.random()*Math.PI});
+  seasonFx.forEach(f=>{
+    f.y+=k==='summer'?0:f.v;f.x+=Math.sin(t+f.s)*.4;f.r+=.02;
+    if(k==='summer'){f.y=f.y<0?H*(.2+Math.random()*.7):f.y;cx.globalAlpha=.4+.4*Math.sin(t*2+f.s);cx.fillStyle='#ffe58a';cx.beginPath();cx.arc(f.x,f.y,3,0,7);cx.fill();cx.globalAlpha=.15;cx.beginPath();cx.arc(f.x,f.y,9,0,7);cx.fill()}
+    else{cx.save();cx.translate(f.x,f.y);cx.rotate(f.r);cx.globalAlpha=.75;
+      if(k==='winter'){cx.fillStyle='#fff';cx.beginPath();cx.arc(0,0,3,0,7);cx.fill()}
+      else if(k==='spring'){cx.fillStyle='#f7c6d4';cx.beginPath();cx.ellipse(0,0,5,3,0,0,7);cx.fill()}
+      else{cx.font='13px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(f.s>3?'🍁':'🍂',0,0);cx.textAlign='start';cx.textBaseline='alphabetic'}
+      cx.restore()}
+  });
+  cx.globalAlpha=1;
+  seasonFx=seasonFx.filter(f=>f.y<H+10);
+  if(k==='winter'){cx.fillStyle='rgba(200,225,255,.12)';cx.fillRect(0,0,W,H)}
+  if(k==='summer'){cx.fillStyle='rgba(255,210,150,.08)';cx.fillRect(0,0,W,H)}
+}
+
+// ---------- boot ----------
+resize();
+seasonUI();
+if(!S.batch){pickUI();$('newOv').hidden=false}
+else{report(catchUp());spawnTinies()}
+ui();
+setInterval(()=>{tick();ui()},2000);
+let hiddenAt=0;
+document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now();return}
+  if(S.batch){report(catchUp());if(Date.now()-hiddenAt>10*60*1000)spawnTinies();if(S.batch&&S.batch.clump&&!S.batch.clump.step)demoId=0;ui()}});
+(function loop(){draw();requestAnimationFrame(loop)})();
+})();
+</script>
+</body>
+</html>

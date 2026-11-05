@@ -281,7 +281,7 @@ function save(){try{localStorage.setItem('kojimuro2',JSON.stringify(S))}catch(e)
 load();
 if(S.hearts===undefined)S.hearts=S.friend||0;S.items=S.items||[];S.unlock=S.unlock||[];
 if(S.batch){if(S.batch.clump&&S.batch.clump.pos&&!S.batch.clump.order){S.batch.clump=null}
-if(S.batch.clump===true){S.batch.clump=null;S.batch.cd=Math.max(0,(S.batch.cd||1)-1)}S.batch.molds.forEach(m=>{if(m.x>.62&&m.y<.48)m.x=.12+Math.random()*.45});S.batch.shape='normal';S.batch.cd=S.batch.cd||0;if(S.batch.cd===0&&S.batch.g>.3)S.batch.cd=1;}
+if(S.batch.clump===true){S.batch.clump=null;S.batch.cd=Math.max(0,(S.batch.cd||1)-1)}S.batch.molds.forEach(m=>{[m.x,m.y]=clampXY(m.x,m.y);if(!isFinite(m.s))m.s=0;if(m.x>.62&&m.y<.48)m.x=.12+Math.random()*.45});S.batch.shape='normal';S.batch.cd=S.batch.cd||0;if(S.batch.cd===0&&S.batch.g>.3)S.batch.cd=1;}
 const learned=()=>new Set(S.tips);
 
 // ---------- toast ----------
@@ -325,7 +325,8 @@ function makeClump(b,timing){
   while(pos.length<n){if(++tries%400===0)md*=.9;const x=.12+Math.random()*.68,y=.2+Math.random()*.7;if(x>.62&&y<.48)continue;
     if(pos.every(p=>Math.hypot(p.x-x,(p.y-y)*.68)>md))pos.push({x,y,r:Math.random()*3})}
   b.clump={id:Date.now(),timing,pos,order:[...Array(n).keys()].sort(()=>Math.random()-.5),step:0};b.clumpH=0;b.hotH=0}
-function safeXY(x,y){if(x>.62&&y<.48)x=.12+Math.random()*.45;return[x,y]}
+function clampXY(x,y){return[Math.min(.92,Math.max(.08,isFinite(x)?x:.5)),Math.min(.92,Math.max(.14,isFinite(y)?y:.6))]}
+function safeXY(x,y){[x,y]=clampXY(x,y);if(x>.62&&y<.48)x=.12+Math.random()*.45;return[x,y]}
 function addMold(b){const [x,y]=safeXY(.12+Math.random()*.76,.22+Math.random()*.66);b.molds.push({x,y,s:Math.random()*6})}
 function catchUp(){
   const b=S.batch;if(!b)return null;
@@ -349,8 +350,10 @@ function report(r){
 // ---------- canvas ----------
 const cv=document.getElementById('tray'),cx=cv.getContext('2d');
 let W=360,H=240,DPR=Math.min(2,devicePixelRatio||1);
-function resize(){const mini=document.body.classList.toggle('mini',innerHeight<560||innerWidth<380);
-  W=cv.parentElement.clientWidth;if(mini)W=Math.min(W,Math.max(200,(innerHeight-150)/0.68));H=Math.round(W*0.68);cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.style.width=W+'px';cv.style.margin='0 auto';kPos=null;cx.setTransform(DPR,0,0,DPR,0,0);grains=null}
+function resize(){const oW=W,oH=H;
+  const mini=document.body.classList.toggle('mini',innerHeight<560||innerWidth<380);
+  W=cv.parentElement.clientWidth;if(mini)W=Math.min(W,Math.max(200,(innerHeight-150)/0.68));H=Math.round(W*0.68);cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.style.width=W+'px';cv.style.margin='0 auto';kPos=null;cx.setTransform(DPR,0,0,DPR,0,0);grains=null;
+  if(oW&&oH&&typeof tinies!=='undefined'){[...tinies,...floats].forEach(o=>{o.x*=W/oW;o.y*=H/oH})}}
 window.addEventListener('resize',resize);
 let grains=null;
 function seeded(seed){let s=seed%2147483647;if(s<=0)s+=2147483646;return()=>(s=s*16807%2147483647)/2147483647}

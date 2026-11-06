@@ -402,9 +402,10 @@ function drawGirl(c,x,y,h,t,mood,tint){
   if(GI.complete&&GI.naturalWidth){
     const gh=h*.92*(GI===GIRL?1:.94),gw=gh*GI.naturalWidth/GI.naturalHeight,bob=Math.sin(t*1.6)*h*.008,tilt=Math.sin(t*1.1)*.025;
     c.save();c.translate(x,y+h*.05+bob);c.rotate(tilt);
-    if(GI!==GIRL){}else if(mood==='hot')c.filter='sepia(.25) saturate(1.3) hue-rotate(-15deg)';
-    else if(mood==='cold')c.filter='saturate(.7) brightness(1.05) hue-rotate(10deg)';
-    else if(mood==='sad')c.filter='grayscale(.35)';
+    c.filter='brightness(1.15) saturate(1.05)';
+    if(GI!==GIRL){}else if(mood==='hot')c.filter='brightness(1.15) sepia(.25) saturate(1.3) hue-rotate(-15deg)';
+    else if(mood==='cold')c.filter='brightness(1.15) saturate(.7) brightness(1.05) hue-rotate(10deg)';
+    else if(mood==='sad')c.filter='brightness(1.15) grayscale(.35)';
     c.drawImage(GI,-gw/2,-gh*.55,gw,gh);c.filter='none';c.restore();
     const u=h/10,fx=x-gw*.13,fy=y+h*.05-gh*.55+gh*.19;if(GI!==GIRL)return;c.save();
     if(mood==='cold'){c.fillStyle='#24365c';c.font=`bold ${Math.round(u*.9)}px sans-serif`;c.fillText('z',fx+1.6*u,fy-.6*u);c.font=`bold ${Math.round(u*.65)}px sans-serif`;c.fillText('z',fx+2.1*u,fy-1.2*u)}

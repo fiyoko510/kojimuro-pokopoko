@@ -272,6 +272,17 @@ const TIPS=[
  {id:'s_summer',t:'暑くて湿気の多い夏は、<b>雑菌やカビがふえやすい</b>季節。麹づくりではとくに温度と清潔さに気をつけるよ。'},
  {id:'s_autumn',t:'秋は新米の季節。とれたてのお米で麹や甘酒をつくる楽しみもあるね。'},
  {id:'s_winter',t:'寒い時期に味噌やお酒をしこむことを「<b>寒仕込み</b>」というよ。気温が低いと雑菌がふえにくいので、昔から仕込みにいい時期とされてきたんだ。'},
+ {id:'tanekoji',t:'麹づくりのスタートに使う<b>種麹</b>をつくる専門の会社「種麹屋」は、日本全国でも<b>十数社ほど</b>しかないといわれているよ。'},
+ {id:'sake',t:'日本酒づくりでは、麹がでんぷんを糖に変え、酵母が糖をアルコールに変える。この2つが同じタンクで同時に進むのを「<b>並行複発酵</b>」というよ。'},
+ {id:'mirin',t:'<b>みりん</b>も麹のなかま。蒸したもち米と米麹を焼酎に漬けて、じっくり熟成させてつくるんだ。'},
+ {id:'su',t:'<b>米酢</b>は微生物のリレー。麹がお米を糖にして、酵母がお酒にして、最後に酢酸菌がお酢にするよ。'},
+ {id:'katsuo',t:'<b>かつおぶし</b>（本枯節）にもカビをつけるよ。コウジカビの仲間が水分を吸い取って、香りとうまみを育てるんだ。'},
+ {id:'shitsudo',t:'麹づくりは温度だけでなく<b>湿度</b>も大事。はじめはしっとり、後半は乾かし気味にすると、菌糸が粒の中まで入りこみやすいよ。'},
+ {id:'kikoji',t:'ふつうの麹菌の胞子は<b>黄緑色</b>。だから米麹や味噌に使う麹菌は「黄麹菌」とも呼ばれるよ。'},
+ {id:'awamori',t:'沖縄の<b>泡盛</b>は黒麹でつくるよ。お米をぜんぶ麹にしてしこむ「全麹仕込み」が特徴なんだ。'},
+ {id:'amazake60',t:'甘酒を<b>55〜60℃</b>でつくるのは、麹菌はもう生きられないけど、でんぷんを糖に変える酵素はいちばん元気に働く温度だからだよ。'},
+ {id:'world',t:'麹は海外でも「<b>Koji</b>」として注目されているよ。レストランのシェフが、お肉の熟成や新しい調味料づくりに使っているんだ。'},
+ {id:'enzyme100',t:'麹菌がつくる酵素は<b>100種類以上</b>あるといわれているよ。だから甘み・うまみ・香りといろんな味を生み出せるんだ。'},
  {id:'master',t:'白くふわふわの菌糸におおわれた麹は「<b>花が咲いた</b>」なんて表現されることも。'},
 ];
 
@@ -572,20 +583,20 @@ function finishClump(b){const m=mood(b.temp),timing=b.clump.timing;b.clump=null;
     toast(TIPS[5].t,'hogusu');toast('本物の麹づくりでも、ほぐす手入れは約2日のあいだに<b>2〜4回くらい</b>。育ち具合を見てタイミングよく行うよ。','teire');}
   else{b.temp=Math.max(ROOM+1,b.temp-4);toast('✨ 熱でできたダマをほぐして、熱をにがしたよ',null,2500);toast(TIPS[4].t,'hot')}
 }
-$('clothBtn').onclick=()=>{const b=S.batch;if(!b)return;b.covered=!b.covered;save();if(b.covered)toast(TIPS[7].t,'cloth');ui()};
+$('clothBtn').onclick=()=>{const b=S.batch;if(!b)return;b.covered=!b.covered;save();if(b.covered)toast(TIPS[7].t,'cloth');else tip('shitsudo');ui()};
 cv.addEventListener('pointerdown',e=>{
   const b=S.batch;if(!b)return;const r=cv.getBoundingClientRect();const px=e.clientX-r.left,py=e.clientY-r.top;
   if(tapClump(px,py))return;
   // tiny molds
   const tr=Math.max(11,W*.036)*1.8;
   let ti=-1,bd=1e9;tinies.forEach((m,i)=>{const d=Math.hypot(m.x-px,m.y-py);if(d<tr&&d<bd){bd=d;ti=i}});
-  if(ti>=0){const m=tinies.splice(ti,1)[0];for(let k=0;k<8;k++)parts.push({x:m.x,y:m.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
+  if(ti>=0){const m=tinies.splice(ti,1)[0];S.kills=(S.kills||0)+1;if(S.kills>=20)tip('katsuo');for(let k=0;k<8;k++)parts.push({x:m.x,y:m.y,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
     if(!tinies.length){b.cleanH=Math.max(b.cleanH||0,2);save();toast('✨ ぜんぶおいはらった！しばらくカビ菌が来にくくなるよ',null,3000);toast(TIPS[8].t,'mold');ui()}
     return}
   // big molds
   const R=Math.max(11,W*.04)*1.6;
   const i=b.molds.findIndex(m=>Math.hypot(m.x*W-px,m.y*H-py)<R);
-  if(i>=0){const m=b.molds.splice(i,1)[0];for(let k=0;k<10;k++)parts.push({x:m.x*W,y:m.y*H,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
+  if(i>=0){const m=b.molds.splice(i,1)[0];S.kills=(S.kills||0)+1;for(let k=0;k<10;k++)parts.push({x:m.x*W,y:m.y*H,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*3,l:1,k:'m'});
     save();toast('カビ菌をとりのぞいたよ！',null,1800);ui();return}
   // big koji-chan talks
   if(kPos&&Math.hypot(px-kPos.x,py-kPos.y)<kPos.r*1.2){talk();return}
@@ -618,9 +629,11 @@ const TALK=[
  'でんぷんを糖に変える酵素を「アミラーゼ」っていうよ。甘酒が甘いのはそのおかげ',
  'たんぱく質をアミノ酸に変える酵素は「プロテアーゼ」。これがうまみのもとだよ',
 ];
+function tip(id,ms){const x=TIPS.find(t=>t.id===id);if(x)toast(x.t,id,ms||5000)}
 function addFriend(){
   const before=Math.min(TALK.length,5+Math.floor((S.friend||0)/5));S.friend=(S.friend||0)+1;S.hearts=(S.hearts||0)+1;save();
   if(S.friend%10===0)startSpecial(true);
+  if(S.friend>=20)tip('kikoji');if(S.friend>=50)tip('world');
   if(Math.min(TALK.length,5+Math.floor(S.friend/5))>before)toast('💬 こうじちゃんと仲よくなって、<b>新しいお話</b>が聞けるようになったよ。大きいこうじちゃんをタップしてみてね',null,4000);
   ui()}
 function talk(){
@@ -640,7 +653,7 @@ function pickUI(){
   list.forEach(t=>{const bt=document.createElement('button');const c=document.createElement('canvas');c.width=60;c.height=36;const g=c.getContext('2d');
     [[18,18],[30,14],[42,20],[26,24],[38,26]].forEach(([x,y],i)=>grain(g,t,x,y,1,i));
     bt.appendChild(c);bt.insertAdjacentHTML('beforeend',KOJI[t].n+`<small>${KOJI[t].raw}でつくる</small>`);
-    bt.onclick=()=>{S.batch={type:t,start:Date.now(),last:Date.now(),g:0,temp:30,q:60,covered:false,molds:[],goodH:0,sat:0,shape:'normal',cd:0,cleanH:0};save();grains=null;$('newOv').hidden=true;toast(TIPS[0].t,'name');toast(TIPS[1].t,'eat');setTimeout(spawnTinies,600);ui()};
+    bt.onclick=()=>{if(S.done.length>=1)setTimeout(()=>tip('tanekoji'),1500);if(t===KURO)setTimeout(()=>tip('awamori'),2500);S.batch={type:t,start:Date.now(),last:Date.now(),g:0,temp:30,q:60,covered:false,molds:[],goodH:0,sat:0,shape:'normal',cd:0,cleanH:0};save();grains=null;$('newOv').hidden=true;toast(TIPS[0].t,'name');toast(TIPS[1].t,'eat');setTimeout(spawnTinies,600);ui()};
     $('pick').appendChild(bt)});
 }
 let finishing=false;
@@ -679,12 +692,12 @@ function drawResult(cv2,type,v){
 function finish(){
   if(finishing)return;finishing=true;
   const b=S.batch;const st=Math.max(1,Math.round(b.q/20));const v=verdictOf(b,st);
-  S.done.push({type:b.type,stars:st,date:Date.now(),v});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();
+  S.done.push({type:b.type,stars:st,date:Date.now(),v});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();if(S.done.length>=3)setTimeout(()=>tip('enzyme100'),1500);
   $('doneTitle').textContent=v==='good'?`🌸 ${KOJI[typ].n}ができた！`:`${KOJI[typ].n}ができた…`;
   $('doneOv').hidden=false;drawResult($('doneCv'),typ,v);
   $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:17px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>　<b>${VERDICT[v].t}</b><br>${VERDICT[v].d}`;
   $('doneUse').innerHTML='🍶 '+KOJI[typ].use+(st<=2?'<br>🌱 ★2以下の麹は、💗こうかん所で<b>畑のぼかし肥料</b>にできるよ。':'')+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
-  toast(TIPS[14].t,'master');toast(TIPS[13].t,'kinds');toast(TIPS[12].t,'quality');
+  tip('master');toast(TIPS[13].t,'kinds');toast(TIPS[12].t,'quality');
 }
 $('doneNext').onclick=()=>{$('doneOv').hidden=true;finishing=false;pickUI();$('newOv').hidden=false};
 
@@ -728,7 +741,7 @@ function shopUI(){
   $('shopList').querySelectorAll('[data-r]').forEach(bt=>bt.onclick=()=>craft(bt.dataset.r));
   $('shopList').querySelectorAll('[data-u]').forEach(bt=>bt.onclick=()=>unlock(bt.dataset.u));
 }
-function craft(id){const r=RECIPES.find(x=>x.id===id);
+function craft(id){const r=RECIPES.find(x=>x.id===id);setTimeout(()=>{tip('mirin');if(id==='amazake')tip('amazake60');if(S.items.length>=3)tip('su')},1200);
   Object.entries(r.need).forEach(([t,n])=>{for(let i=0;i<n;i++){const k=S.done.filter(x=>isNeed(x,t)&&!x.used).sort((a,b)=>a.stars-b.stars)[0];if(k)k.used=id}});
   S.hearts-=r.cost;S.items.push(id);save();shopUI();ui();
   const c=cards().find(x=>x.key===id);$('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=`${r.n}をしこんだよ！`;
@@ -787,6 +800,7 @@ async function pResolve(){
     for(let x=0;x<N;x++){let w=N-1;for(let y=N-1;y>=0;y--)if(PG[y][x]){if(w!==y){PG[w][x]=PG[y][x];PG[y][x]=0;pOff[w][x]=(w-y)}w--}
       for(let y=w;y>=0;y--){PG[y][x]=rndT();pOff[y][x]=w+1}}
     if(chain>=2)pInfo(`${chain}連鎖！`);
+    if(chain>=3)tip('sake');
     await sleep(240);
   }
 }

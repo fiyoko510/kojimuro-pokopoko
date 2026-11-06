@@ -585,10 +585,10 @@ function drawOil(b,t){
   const pal=OILC[b.type]||OILC[1],sp=Date.now()<specialUntil,g=b.g;
   cx.save();cx.beginPath();cx.roundRect?cx.roundRect(8,8,W-16,H-16,11):cx.rect(8,8,W-16,H-16);cx.clip();
   const base=pal[1];cx.fillStyle=`rgb(${base})`;cx.fillRect(0,0,W,H);
-  const N=7,sp2=sp?2.2:1;
+  const N=10,sp2=sp?2.2:1;
   for(let i=0;i<N;i++){const c=pal[(i+1)%pal.length],ph=i*1.7;
     const x=W*(.5+.42*Math.sin(t*.07*sp2+ph)*Math.cos(t*.043+ph*.6)),y=H*(.5+.4*Math.cos(t*.06*sp2+ph*1.3)*Math.sin(t*.037+ph)),
-      r=Math.max(W,H)*(.32+.12*Math.sin(t*.09+ph));
+      r=Math.max(W,H)*(.16+.06*Math.sin(t*.09+ph));
     const gr=cx.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,`rgba(${c},.85)`);gr.addColorStop(.55,`rgba(${c},.35)`);gr.addColorStop(1,`rgba(${c},0)`);
     cx.fillStyle=gr;cx.fillRect(0,0,W,H)}
   // growth: koji bloom whitens the surface
@@ -603,7 +603,7 @@ function drawOil(b,t){
   ripT-=1/60;if(ripT<=0){ripT=(sp?.5:3.5)+Math.random()*2;addRipple(W*(.15+Math.random()*.6),H*(.2+Math.random()*.65),sp)}
   if(sp&&Math.random()<.05)addRipple(W*.45,H*.55,true);
   ripples.forEach(p=>{p.r+=p.v/60;const a=p.a*(1-p.r/(Math.max(W,H)*.45));if(a<=0)return;
-    for(let k=0;k<2;k++){const rr2=p.r-k*9;if(rr2<=0)continue;cx.strokeStyle=`rgba(255,255,255,${a*(k?0.5:1)})`;cx.lineWidth=k?1:1.8;cx.beginPath();cx.ellipse(p.x,p.y,rr2,rr2*.62,0,0,7);cx.stroke()}});
+    for(let k=0;k<2;k++){const rr2=p.r-k*9;if(rr2<=0)continue;cx.strokeStyle=`rgba(255,255,255,${a*(k?0.5:1)})`;cx.lineWidth=k?1:1.8;cx.beginPath();cx.arc(p.x,p.y,rr2,0,7);cx.stroke()}});
   ripples=ripples.filter(p=>p.r<Math.max(W,H)*.45);
   cx.restore();
 }

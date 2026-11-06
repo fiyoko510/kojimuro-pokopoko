@@ -205,7 +205,6 @@ body.mini #ff,body.mini #sw{display:none!important}
     <p style="font-size:12px;margin-top:0">もっているハート <b id="shopHearts" style="color:#e57d9a"></b>　<span style="opacity:.6">（ちびこうじちゃんを2回タップでもらえるよ）</span></p>
     <div id="shopList"></div>
     <p style="font-size:11px;opacity:.7;margin:8px 0 0">🏺 しこんだものはカードになって、<b>麹だな</b>にかざられるよ。</p>
-    <button class="big ghost" id="danceBtn">🎉 ダンスをもう一回見る</button>
     <button class="big" data-close>とじる</button>
   </div>
 </div>
@@ -735,8 +734,7 @@ function craft(id){const r=RECIPES.find(x=>x.id===id);
   $('madeTxt').innerHTML='📖 '+r.txt+'<br><br>🏺 カードは<b>麹だな</b>にかざったよ。右上の🏺からいつでも見られるよ。';$('madeOv').hidden=false}
 function unlock(id){const u=UNLOCKS.find(x=>x.id===id);S.hearts-=u.cost;S.unlock.push(id);save();shopUI();ui();
   $('madeIcon').innerHTML=`<div style="font-size:54px">${u.ic}</div>`;$('madeTitle').textContent=`${u.n}をてにいれた！`;$('madeTxt').innerHTML='📖 '+u.txt+'<br>今の麹が完成したら、次の仕込みで選べるよ。';$('madeOv').hidden=false}
-$('friend').onclick=()=>{shopUI();$('danceBtn').hidden=(S.friend||0)<10;$('shopOv').hidden=false};
-$('danceBtn').onclick=()=>{$('shopOv').hidden=true;startSpecial(false)};
+$('friend').onclick=()=>{shopUI();$('shopOv').hidden=false};
 
 // ---------- note & collection ----------
 $('noteBtn').onclick=()=>{const L=learned();$('noteList').innerHTML=TIPS.map((x,i)=>L.has(x.id)?`<div class="tip"><b>${i+1}.</b> ${x.t}</div>`:`<div class="tip locked"><b>${i+1}.</b> ？？？（お世話すると読めるよ）</div>`).join('')+`<p style="font-size:12px;text-align:right;margin:4px 0 0">${L.size} / ${TIPS.length} ページ</p>`;$('noteOv').hidden=false};

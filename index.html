@@ -22,26 +22,27 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic",sans-serif;user-select:none;-webkit-user-select:none}
 #app{max-width:480px;margin:0 auto;padding:10px 12px 18px}
-header{display:flex;align-items:center;justify-content:space-between}
-h1{font-size:18px;margin:0;font-weight:900}
-h1 small{display:block;font-size:10px;font-weight:500;opacity:.6}
-.chip{white-space:nowrap;border:0;background:#fff;border-radius:999px;padding:5px 11px;font:inherit;font-size:12px;font-weight:700;color:var(--ink);box-shadow:0 1px 0 #d9e9ee}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;row-gap:6px}
+header>div{margin-left:auto}
+h1{font-size:21px;margin:0;font-weight:900}
+h1 small{display:block;font-size:12px;font-weight:500;opacity:.6}
+.chip{white-space:nowrap;border:0;background:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:15px;font-weight:700;color:var(--ink);box-shadow:0 1px 0 #d9e9ee}
 .card{background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 1px 0 #d9e9ee;margin-top:8px}
 #trayWrap{position:relative;margin-top:8px}
 #tray{display:block;width:100%;border-radius:16px;touch-action:manipulation}
-#bubble{position:relative;margin:0 0 10px auto;width:86%;height:52px;display:flex;align-items:center;background:#fff;border-radius:14px;padding:6px 12px;font-size:12px;font-weight:700;line-height:1.5;box-shadow:0 2px 8px rgba(36,54,92,.12)}
+#bubble{position:relative;margin:0 0 10px auto;width:86%;height:52px;display:flex;align-items:center;background:#fff;border-radius:14px;padding:6px 12px;font-size:13px;font-weight:700;line-height:1.5;box-shadow:0 2px 8px rgba(36,54,92,.12)}
 #bubble:after{content:"";position:absolute;right:38px;bottom:-12px;border:6px solid transparent;border-top-color:#fff}
 .row{display:flex;align-items:center;gap:8px}
-.lbl{font-size:11px;font-weight:700;opacity:.65;min-width:46px}
+.lbl{font-size:12px;font-weight:700;opacity:.65;min-width:46px}
 .bar{position:relative;flex:1;height:12px;border-radius:8px;background:#edf5f7;overflow:hidden}
 .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;transition:width .4s,background .4s}
 #zone{position:absolute;top:0;bottom:0;background:rgba(60,184,200,.2)}
-#tval{font-weight:900;font-size:16px;min-width:62px;text-align:right}
-#gval,#qval{font-weight:900;font-size:13px;min-width:62px;text-align:right}
-.meta{font-size:11px;opacity:.7;margin-top:6px;line-height:1.5}
+#tval{font-weight:900;font-size:17px;min-width:62px;text-align:right}
+#gval,#qval{font-weight:900;font-size:14px;min-width:62px;text-align:right}
+.meta{font-size:12px;opacity:.7;margin-top:6px;line-height:1.5}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.b{border:0;border-radius:14px;padding:11px 6px;font:inherit;font-weight:900;font-size:15px;color:var(--ink);background:#fff;box-shadow:0 3px 0 #cfe3e8}
-.b small{display:block;font-size:10px;font-weight:500;opacity:.75}
+.b{border:0;border-radius:14px;padding:11px 6px;font:inherit;font-weight:900;font-size:16px;color:var(--ink);background:#fff;box-shadow:0 3px 0 #cfe3e8}
+.b small{display:block;font-size:11px;font-weight:500;opacity:.75}
 .b:active{transform:translateY(2px);box-shadow:none}
 .b.teal{background:var(--teal);color:#fff;box-shadow:0 3px 0 #2a8e9b}
 .b.wide{grid-column:1/3}
@@ -57,46 +58,46 @@ h1 small{display:block;font-size:10px;font-weight:500;opacity:.6}
 /* mini mode: small window in a corner */
 body.mini #app{padding:6px 8px 8px}
 body.mini h1{display:none}body.mini header{justify-content:flex-end}
-body.mini #toast{font-size:11px;padding:6px 10px;top:6px}
+body.mini #toast{font-size:12px;padding:6px 10px;top:6px}
 html,body{overflow-x:hidden}
-body.mini .chip{padding:3px 8px;font-size:11px}
-body.mini #bubble{height:38px;font-size:11px;line-height:1.35;padding:4px 10px;margin-bottom:7px;width:92%}
+body.mini .chip{padding:3px 8px;font-size:12px}
+body.mini #bubble{height:38px;font-size:12px;line-height:1.35;padding:4px 10px;margin-bottom:7px;width:92%}
 body.mini #bubble:after{right:26px}
 body.mini #trayWrap{margin-top:4px}
 body.mini .card{padding:6px 10px;margin-top:6px}
 body.mini .qrow,body.mini #meta{display:none}
 body.mini .row+.row{margin-top:4px!important}
-body.mini #tval{font-size:13px}
+body.mini #tval{font-size:14px}
 body.mini .btns{margin-top:6px;gap:6px}
-body.mini .b{padding:6px 4px;font-size:13px}body.mini .b small{display:none}
+body.mini .b{padding:6px 4px;font-size:14px}body.mini .b small{display:none}
 body.mini #ff,body.mini #sw{display:none!important}
-#ff{display:block;margin:12px auto 0;border:0;background:none;font:inherit;font-size:11px;color:var(--ink);opacity:.5;text-decoration:underline}
+#ff{display:block;margin:12px auto 0;border:0;background:none;font:inherit;font-size:12px;color:var(--ink);opacity:.5;text-decoration:underline}
 .ov{position:fixed;inset:0;background:rgba(243,249,251,.95);display:flex;align-items:center;justify-content:center;z-index:10;padding:14px}
 .ov[hidden]{display:none}
 .sheet{background:#fff;border-radius:20px;max-width:420px;width:100%;padding:16px;box-shadow:0 8px 30px rgba(36,54,92,.12);max-height:94vh;overflow:auto}
-.sheet h2{margin:0 0 6px;font-size:19px;font-weight:900}
-.sheet p,.sheet li{font-size:13px;line-height:1.7}
+.sheet h2{margin:0 0 6px;font-size:20px;font-weight:900}
+.sheet p,.sheet li{font-size:14px;line-height:1.7}
 .sheet ul{padding-left:1.1em;margin:6px 0}
-.tip{background:#f3f9fb;border-radius:12px;padding:8px 10px;margin:6px 0;font-size:12px;line-height:1.6}
+.tip{background:#f3f9fb;border-radius:12px;padding:8px 10px;margin:6px 0;font-size:13px;line-height:1.6}
 .tip.locked{opacity:.45}
 .pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-.pick button{border:0;border-radius:14px;background:#f3f9fb;padding:10px 4px;font:inherit;font-weight:900;font-size:14px;color:var(--ink);box-shadow:0 3px 0 #d3e5ea}
-.pick button small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:2px}
+.pick button{border:0;border-radius:14px;background:#f3f9fb;padding:10px 4px;font:inherit;font-weight:900;font-size:15px;color:var(--ink);box-shadow:0 3px 0 #d3e5ea}
+.pick button small{display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px}
 .pick canvas{display:block;margin:0 auto 4px}
-#toast{position:fixed;left:50%;top:12px;transform:translate(-50%,-10px);width:min(440px,92vw);background:#fff;border-radius:14px;padding:9px 12px;font-size:12px;line-height:1.6;box-shadow:0 6px 18px rgba(36,54,92,.18);opacity:0;transition:.3s;pointer-events:none;z-index:30}
+#toast{position:fixed;left:50%;top:12px;transform:translate(-50%,-10px);width:min(440px,92vw);background:#fff;border-radius:14px;padding:9px 12px;font-size:13px;line-height:1.6;box-shadow:0 6px 18px rgba(36,54,92,.18);opacity:0;transition:.3s;pointer-events:none;z-index:30}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast b{color:var(--teal)}
 /* puzzle */
 #pz .sheet{padding:12px}
-#pzHead{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:14px;gap:6px;flex-wrap:wrap}#pzInfo{font-size:12px}
+#pzHead{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:15px;gap:6px;flex-wrap:wrap}#pzInfo{font-size:13px}
 #pzCv{display:block;margin:8px auto 0;touch-action:none;border-radius:14px}
-.big{display:block;width:100%;border:0;border-radius:14px;padding:12px;font:inherit;font-weight:900;font-size:15px;color:#fff;background:var(--teal);box-shadow:0 3px 0 #2a8e9b;margin-top:10px}
+.big{display:block;width:100%;border:0;border-radius:14px;padding:12px;font:inherit;font-weight:900;font-size:16px;color:#fff;background:var(--teal);box-shadow:0 3px 0 #2a8e9b;margin-top:10px}
 .big.ghost{background:#eef6f8;color:var(--ink);box-shadow:0 3px 0 #d3e5ea}
 .row2{display:flex;align-items:center;gap:10px;background:#f3f9fb;border-radius:14px;padding:8px 10px;margin:6px 0}
-.row2 .ic{font-size:28px;width:36px;text-align:center}
-.row2 .tx{flex:1;font-size:12px;line-height:1.5}
-.row2 .tx b{font-size:14px}
-.row2 button{border:0;border-radius:12px;padding:8px 10px;font:inherit;font-weight:900;font-size:13px;color:#fff;background:var(--teal);box-shadow:0 2px 0 #2a8e9b;white-space:nowrap}
+.row2 .ic{font-size:29px;width:36px;text-align:center}
+.row2 .tx{flex:1;font-size:13px;line-height:1.5}
+.row2 .tx b{font-size:15px}
+.row2 button{border:0;border-radius:12px;padding:8px 10px;font:inherit;font-weight:900;font-size:14px;color:#fff;background:var(--teal);box-shadow:0 2px 0 #2a8e9b;white-space:nowrap}
 .row2 button:disabled{background:#c9dde1;box-shadow:none}
 .tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:6px}
 .tc{position:relative;aspect-ratio:2/3.3;border-radius:10px;padding:5px;color:#f6e7bf;text-align:center;cursor:pointer;
@@ -105,25 +106,25 @@ body.mini #ff,body.mini #sw{display:none!important}
 .tc:after{content:"";position:absolute;inset:7px;border:.8px solid rgba(217,181,106,.55);border-radius:5px;pointer-events:none}
 .tc.koji{--c1:#1f5d63;--c2:#0f3238}
 .tc.item{--c1:#3b2f63;--c2:#1c1736}
-.tc .tn{font-family:Georgia,serif;font-size:10px;letter-spacing:.1em;margin-top:6px;color:#e8c77c}
+.tc .tn{font-family:Georgia,serif;font-size:11px;letter-spacing:.1em;margin-top:6px;color:#e8c77c}
 .tc .arch{flex:1;width:72%;margin:4px 0;border:1.2px solid #d9b56a;border-radius:999px 999px 6px 6px;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 50% 40%,rgba(255,236,180,.35),rgba(255,236,180,0) 70%)}
-.tc .arch span{font-size:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
-.tc .tname{font-size:12px;font-weight:900;color:#fff4d6}
-.tc .tsub{font-family:Georgia,serif;font-size:6.5px;letter-spacing:.12em;opacity:.8;margin-bottom:8px}
-.tc .cnt{position:absolute;right:6px;top:6px;background:#e8c77c;color:#2a2148;border-radius:999px;font-size:9px;font-weight:900;padding:1px 5px;z-index:1}
+.tc .arch span{font-size:29px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.tc .tname{font-size:13px;font-weight:900;color:#fff4d6}
+.tc .tsub{font-family:Georgia,serif;font-size:7.5px;letter-spacing:.12em;opacity:.8;margin-bottom:8px}
+.tc .cnt{position:absolute;right:6px;top:6px;background:#e8c77c;color:#2a2148;border-radius:999px;font-size:10px;font-weight:900;padding:1px 5px;z-index:1}
 .tc.back{--c1:#2a3555;--c2:#151b30;cursor:default}
 .tc .bk{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:repeating-linear-gradient(45deg,rgba(217,181,106,.12) 0 6px,transparent 6px 12px);border-radius:6px}
-.tc .bk span{color:#d9b56a;font-size:14px}.tc .bk b{color:#d9b56a;font-size:22px;font-family:Georgia,serif}.tc .bk small{font-size:9px;opacity:.6}
+.tc .bk span{color:#d9b56a;font-size:15px}.tc .bk b{color:#d9b56a;font-size:23px;font-family:Georgia,serif}.tc .bk small{font-size:10px;opacity:.6}
 .tc.big{width:170px;margin:0 auto;cursor:default}
-.tc.big .tn{font-size:14px;margin-top:10px}.tc.big .arch span{font-size:64px}.tc.big .tname{font-size:20px}.tc.big .tsub{font-size:10px;margin-bottom:14px}
+.tc.big .tn{font-size:15px;margin-top:10px}.tc.big .arch span{font-size:65px}.tc.big .tname{font-size:21px}.tc.big .tsub{font-size:11px;margin-bottom:14px}
 .flipin .tc{animation:flip .8s ease-out}
 @keyframes flip{0%{transform:perspective(600px) rotateY(180deg) scale(.7);opacity:0}60%{opacity:1}100%{transform:perspective(600px) rotateY(0) scale(1)}}
 #madeOv{z-index:12}
-.sec{font-size:12px;font-weight:900;opacity:.6;margin:12px 0 2px}
+.sec{font-size:13px;font-weight:900;opacity:.6;margin:12px 0 2px}
 .col{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.col span{background:#f3f9fb;border-radius:10px;padding:4px 8px;font-size:12px}
+.col span{background:#f3f9fb;border-radius:10px;padding:4px 8px;font-size:13px}
 </style>
 </head>
 <body>
@@ -141,7 +142,7 @@ body.mini #ff,body.mini #sw{display:none!important}
   <div class="card">
     <div class="row"><span class="lbl">温度</span><div class="bar"><div id="zone"></div><i id="tbar"></i></div><span id="tval">--</span></div>
     <div class="row" style="margin-top:7px"><span class="lbl">育ち</span><div class="bar"><i id="gbar" style="background:var(--teal)"></i></div><span id="gval">--</span></div>
-    <div class="row qrow" style="margin-top:7px"><span class="lbl">できばえ</span><div style="flex:1;font-size:15px;letter-spacing:2px" id="stars"></div><span id="qval"></span></div>
+    <div class="row qrow" style="margin-top:7px"><span class="lbl">できばえ</span><div style="flex:1;font-size:16px;letter-spacing:2px" id="stars"></div><span id="qval"></span></div>
     <div class="meta" id="meta"></div>
   </div>
 
@@ -150,7 +151,7 @@ body.mini #ff,body.mini #sw{display:none!important}
     <button class="b teal" id="pzBtn">🍚 ごはんパズル<small>栄養をあげる</small></button>
   </div>
   <button id="ff">⏩ 試作用：1時間すすめる</button>
-  <button id="sw" style="display:block;margin:4px auto 0;border:0;background:none;font:inherit;font-size:11px;color:var(--ink);opacity:.5;text-decoration:underline">🔄 試作用：季節をかえる</button>
+  <button id="sw" style="display:block;margin:4px auto 0;border:0;background:none;font:inherit;font-size:12px;color:var(--ink);opacity:.5;text-decoration:underline">🔄 試作用：季節をかえる</button>
 </div>
 
 <div id="toast"></div>
@@ -173,7 +174,7 @@ body.mini #ff,body.mini #sw{display:none!important}
     </ul>
     <p style="font-weight:900;margin-bottom:0">どの原料でしこむ？</p>
     <div class="pick" id="pick"></div>
-    <p style="font-size:11px;opacity:.6;margin:8px 0 0">いまの試作品は、約10時間でひとつ完成するよ。データはこの端末のブラウザに保存されるよ。</p>
+    <p style="font-size:12px;opacity:.6;margin:8px 0 0">いまの試作品は、約10時間でひとつ完成するよ。データはこの端末のブラウザに保存されるよ。</p>
   </div>
 </div>
 
@@ -192,7 +193,7 @@ body.mini #ff,body.mini #sw{display:none!important}
 <div class="ov" id="noteOv" hidden>
   <div class="sheet">
     <h2>📖 麹のまめちしきノート</h2>
-    <p style="font-size:12px;opacity:.7;margin-top:0">お世話をしているとページが増えていくよ。</p>
+    <p style="font-size:13px;opacity:.7;margin-top:0">お世話をしているとページが増えていくよ。</p>
     <div id="noteList"></div>
     <button class="big" data-close>とじる</button>
   </div>
@@ -202,9 +203,9 @@ body.mini #ff,body.mini #sw{display:none!important}
 <div class="ov" id="shopOv" hidden>
   <div class="sheet">
     <h2>💗 ハートこうかん所</h2>
-    <p style="font-size:12px;margin-top:0">もっているハート <b id="shopHearts" style="color:#e57d9a"></b>　<span style="opacity:.6">（ちびこうじちゃんを2回タップでもらえるよ）</span></p>
+    <p style="font-size:13px;margin-top:0">もっているハート <b id="shopHearts" style="color:#e57d9a"></b>　<span style="opacity:.6">（ちびこうじちゃんを2回タップでもらえるよ）</span></p>
     <div id="shopList"></div>
-    <p style="font-size:11px;opacity:.7;margin:8px 0 0">🏺 しこんだものはカードになって、<b>麹だな</b>にかざられるよ。</p>
+    <p style="font-size:12px;opacity:.7;margin:8px 0 0">🏺 しこんだものはカードになって、<b>麹だな</b>にかざられるよ。</p>
     <button class="big" data-close>とじる</button>
   </div>
 </div>
@@ -230,7 +231,7 @@ body.mini #ff,body.mini #sw{display:none!important}
 <div class="ov" id="pz" hidden>
   <div class="sheet">
     <div id="pzHead"><span>🍚 ごはんパズル</span><span id="pzInfo"></span></div>
-    <div style="font-size:11px;opacity:.7;margin-top:4px">となりと入れかえて、同じ原料を<b>たてか横に一列で3つ以上</b>ならべてね（L字や斜めは消えないよ）。落ちてこないから、ゆっくりで大丈夫。</div>
+    <div style="font-size:12px;opacity:.7;margin-top:4px">となりと入れかえて、同じ原料を<b>たてか横に一列で3つ以上</b>ならべてね（L字や斜めは消えないよ）。落ちてこないから、ゆっくりで大丈夫。</div>
     <canvas id="pzCv"></canvas>
     <button class="big ghost" id="pzQuit">ここでやめる（そこまでの栄養をあげる）</button>
   </div>
@@ -681,7 +682,7 @@ function finish(){
   S.done.push({type:b.type,stars:st,date:Date.now(),v});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();
   $('doneTitle').textContent=v==='good'?`🌸 ${KOJI[typ].n}ができた！`:`${KOJI[typ].n}ができた…`;
   $('doneOv').hidden=false;drawResult($('doneCv'),typ,v);
-  $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:16px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>　<b>${VERDICT[v].t}</b><br>${VERDICT[v].d}`;
+  $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:17px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>　<b>${VERDICT[v].t}</b><br>${VERDICT[v].d}`;
   $('doneUse').innerHTML='🍶 '+KOJI[typ].use+(st<=2?'<br>🌱 ★2以下の麹は、💗こうかん所で<b>畑のぼかし肥料</b>にできるよ。':'')+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
   toast(TIPS[14].t,'master');toast(TIPS[13].t,'kinds');toast(TIPS[12].t,'quality');
 }
@@ -733,15 +734,15 @@ function craft(id){const r=RECIPES.find(x=>x.id===id);
   const c=cards().find(x=>x.key===id);$('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=`${r.n}をしこんだよ！`;
   $('madeTxt').innerHTML='📖 '+r.txt+'<br><br>🏺 カードは<b>麹だな</b>にかざったよ。右上の🏺からいつでも見られるよ。';$('madeOv').hidden=false}
 function unlock(id){const u=UNLOCKS.find(x=>x.id===id);S.hearts-=u.cost;S.unlock.push(id);save();shopUI();ui();
-  $('madeIcon').innerHTML=`<div style="font-size:54px">${u.ic}</div>`;$('madeTitle').textContent=`${u.n}をてにいれた！`;$('madeTxt').innerHTML='📖 '+u.txt+'<br>今の麹が完成したら、次の仕込みで選べるよ。';$('madeOv').hidden=false}
+  $('madeIcon').innerHTML=`<div style="font-size:55px">${u.ic}</div>`;$('madeTitle').textContent=`${u.n}をてにいれた！`;$('madeTxt').innerHTML='📖 '+u.txt+'<br>今の麹が完成したら、次の仕込みで選べるよ。';$('madeOv').hidden=false}
 $('friend').onclick=()=>{shopUI();$('shopOv').hidden=false};
 
 // ---------- note & collection ----------
-$('noteBtn').onclick=()=>{const L=learned();$('noteList').innerHTML=TIPS.map((x,i)=>L.has(x.id)?`<div class="tip"><b>${i+1}.</b> ${x.t}</div>`:`<div class="tip locked"><b>${i+1}.</b> ？？？（お世話すると読めるよ）</div>`).join('')+`<p style="font-size:12px;text-align:right;margin:4px 0 0">${L.size} / ${TIPS.length} ページ</p>`;$('noteOv').hidden=false};
+$('noteBtn').onclick=()=>{const L=learned();$('noteList').innerHTML=TIPS.map((x,i)=>L.has(x.id)?`<div class="tip"><b>${i+1}.</b> ${x.t}</div>`:`<div class="tip locked"><b>${i+1}.</b> ？？？（お世話すると読めるよ）</div>`).join('')+`<p style="font-size:13px;text-align:right;margin:4px 0 0">${L.size} / ${TIPS.length} ページ</p>`;$('noteOv').hidden=false};
 $('colBtn').onclick=()=>{const d=S.done,cs=cards(),got=cs.filter(c=>c.own).length;
   let h=`<div class="sec">🃏 麹カード　${got} / ${cs.length}</div><div class="tgrid">${cs.map(c=>cardHTML(c)).join('')}</div>`;
   h+=`<div class="sec">🌾 しこみに使える麹</div><div class="col">${[...TYPES,KURO].filter(t=>t!==KURO||S.unlock.includes('kuro')).map(t=>`<span>${KOJI[t].n} × ${stock(t)}</span>`).join('')}</div>`;
-  h+=`<div class="sec">📜 育てた麹の記録</div>`+(d.length?d.slice().reverse().map(x=>`<div class="tip">${KOJI[x.type].n}　<span style="color:#f2b84b">${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)}</span>　<span style="opacity:.6">${new Date(x.date).toLocaleDateString('ja-JP')}${x.used?'・'+RECIPES.find(r=>r.id===x.used).n+'に':''}</span></div>`).join(''):'<p style="font-size:12px">まだないよ。最初の麹を育ててみよう！</p>');
+  h+=`<div class="sec">📜 育てた麹の記録</div>`+(d.length?d.slice().reverse().map(x=>`<div class="tip">${KOJI[x.type].n}　<span style="color:#f2b84b">${'★'.repeat(x.stars)}${'☆'.repeat(5-x.stars)}</span>　<span style="opacity:.6">${new Date(x.date).toLocaleDateString('ja-JP')}${x.used?'・'+RECIPES.find(r=>r.id===x.used).n+'に':''}</span></div>`).join(''):'<p style="font-size:13px">まだないよ。最初の麹を育ててみよう！</p>');
   $('colList').innerHTML=h;
   $('colList').querySelectorAll('.tc[data-k]').forEach(el=>el.onclick=()=>{const c=cs.find(x=>String(x.key)===el.dataset.k);
     $('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=c.n+(c.own>1?`（${c.own}まい）`:'');$('madeTxt').innerHTML='📖 '+c.txt;$('madeOv').hidden=false});

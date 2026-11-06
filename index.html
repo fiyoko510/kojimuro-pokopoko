@@ -9,7 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=2">
 <meta property="og:type" content="website">
 <meta property="og:title" content="こうじむろ ぽこぽこ">
 <meta property="og:description" content="ちょいちょい育てる 麹のおせわゲーム。遊びながら麹のしくみがわかる癒しゲーム。">
@@ -1022,5 +1022,6 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=D
 (function loop(){draw();requestAnimationFrame(loop)})();
 })();
 </script>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})</script>
 </body>
 </html>

@@ -650,7 +650,7 @@ const VERDICT={
  clump:{t:'むれた麹',d:'ダマをほぐさなかったから、中に熱と湿気がこもって、べちゃっとかたまっちゃった。育ちにムラがあるよ。'},
  cold:{t:'育ちが足りない麹',d:'寒い時間が長くて、菌糸が表面にうっすらついただけ。芯がかたくて、甘みを生む酵素も少なめだよ。'}};
 function verdictOf(b,st){if(st>=4)return'good';const L=b.loss||{};
-  const c=[['mold',L.mold||0],['hot',L.hot||0],['clump',L.clump||0],['cold',(L.cold||0)*4]].sort((a,b)=>b[1]-a[1]);return c[0][1]>0?c[0][0]:'good'}
+  const c=[['mold',L.mold||0],['hot',L.hot||0],['clump',L.clump||0],['cold',(L.cold||0)*4]].sort((a,b)=>b[1]-a[1]);return c[0][1]>0?c[0][0]:'mold'}
 function drawResult(cv2,type,v){
   const w=cv2.parentElement.clientWidth-32||300,h=Math.round(w*.6),d=Math.min(2,devicePixelRatio||1);
   cv2.width=w*d;cv2.height=h*d;cv2.style.height=h+'px';const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);

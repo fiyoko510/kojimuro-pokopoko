@@ -131,7 +131,7 @@ body.mini #ff,body.mini #sw{display:none!important}
 <div id="app">
   <header>
     <h1>こうじむろ ぽこぽこ<small>ちょいちょい育てる 麹のおせわ</small></h1>
-    <div style="display:flex;gap:6px"><button class="chip" id="friend" style="color:#e57d9a">♡0</button><button class="chip" id="seasonBtn"></button><button class="chip" id="colBtn">🏺</button><button class="chip" id="noteBtn">📖</button></div>
+    <div style="display:flex;gap:6px"><button class="chip" id="friend" style="color:#e57d9a">♡0</button><button class="chip" id="bgmBtn" aria-label="BGM">🎵</button><button class="chip" id="seasonBtn"></button><button class="chip" id="colBtn">🏺</button><button class="chip" id="noteBtn">📖</button></div>
   </header>
 
   <div id="trayWrap">
@@ -292,6 +292,7 @@ function load(){try{S=JSON.parse(localStorage.getItem('kojimuro2')||'null')}catc
   if(!S)S={batch:null,done:[],tips:[]};}
 function save(){try{localStorage.setItem('kojimuro2',JSON.stringify(S))}catch(e){}}
 load();
+if(S.bgmOn===undefined)S.bgmOn=true;
 if(S.hearts===undefined)S.hearts=S.friend||0;S.items=S.items||[];S.unlock=S.unlock||[];
 if(S.batch){if(S.batch.clump&&S.batch.clump.pos&&!S.batch.clump.order){S.batch.clump=null}
 if(S.batch.clump===true){S.batch.clump=null;S.batch.cd=Math.max(0,(S.batch.cd||1)-1)}S.batch.molds.forEach(m=>{[m.x,m.y]=clampXY(m.x,m.y);if(!isFinite(m.s))m.s=0;if(m.x>.62&&m.y<.48)m.x=.12+Math.random()*.45});S.batch.shape='normal';S.batch.cd=S.batch.cd||0;if(S.batch.cd===0&&S.batch.g>.3)S.batch.cd=1;}
@@ -514,8 +515,38 @@ function draw(){
   drawClumps(b);
   draw2(t);
 }
+
+// ---------- sound ----------
+let AC=null,master=null,bgmGain=null,bgmTimer=null,bgmStep=0,bgmNext=0;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.9;master.connect(AC.destination);
+  bgmGain=AC.createGain();bgmGain.gain.value=0;bgmGain.connect(master)}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t0,dur,vol,dest,type){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  o.connect(g);g.connect(dest||master);o.start(t0);o.stop(t0+dur+.05);
+  const o2=a.createOscillator(),g2=a.createGain();o2.type='sine';o2.frequency.value=f*2;g2.gain.setValueAtTime(0,t0);g2.gain.linearRampToValueAtTime(vol*.25,t0+.01);g2.gain.exponentialRampToValueAtTime(.0001,t0+dur*.6);o2.connect(g2);g2.connect(dest||master);o2.start(t0);o2.stop(t0+dur);}
+const DOREMI=[523.25,587.33,659.25,698.46,783.99,880.00];// ド レ ミ ファ ソ ラ
+function playNote(i){const a=ac();if(!a)return;tone(DOREMI[i%6],a.currentTime+.01,.9,.22,master,'triangle')}
+function playBoo(){const a=ac();if(!a)return;const t=a.currentTime;tone(220,t,.25,.12,master,'sine');tone(207.65,t+.12,.35,.12,master,'sine')}
+function playClear(){const a=ac();if(!a)return;const t=a.currentTime;[0,2,4,7].forEach((k,j)=>tone(523.25*Math.pow(2,k/12),t+j*.09,.8,.16,master,'triangle'))}
+// music-box BGM (C major pentatonic, slow)
+const MEL=[[0,1],[4,1],[7,1],[9,2],[7,1],[4,1],[2,2],[4,1],[7,1],[4,1],[2,1],[0,3],[-1,1],
+  [2,1],[4,1],[7,1],[12,2],[9,1],[7,1],[4,2],[2,1],[4,1],[0,1],[2,1],[0,3],[-1,1]];
+const BASS=[0,0,-5,-5,-3,-3,-7,-7];
+function bgmTick(){if(!AC||!S.bgmOn)return;const beat=.42;
+  while(bgmNext<AC.currentTime+1.2){const [n,len]=MEL[bgmStep%MEL.length];
+    if(n>=0)tone(523.25*Math.pow(2,n/12),bgmNext,1.6,.09,bgmGain,'sine');
+    if(bgmStep%3===0){const bn=BASS[Math.floor(bgmStep/3)%BASS.length];tone(130.81*Math.pow(2,bn/12),bgmNext,2.2,.06,bgmGain,'sine')}
+    bgmNext+=beat*len;bgmStep++}}
+function bgmStart(){if(!ac())return;bgmGain.gain.cancelScheduledValues(AC.currentTime);bgmGain.gain.linearRampToValueAtTime(.9,AC.currentTime+1.5);
+  if(!bgmTimer){bgmNext=AC.currentTime+.3;bgmTimer=setInterval(bgmTick,250)}}
+function bgmStop(){if(!AC)return;bgmGain.gain.cancelScheduledValues(AC.currentTime);bgmGain.gain.linearRampToValueAtTime(0,AC.currentTime+.6);
+  setTimeout(()=>{if(!S.bgmOn&&bgmTimer){clearInterval(bgmTimer);bgmTimer=null}},700)}
+function bgmUI(){$('bgmBtn').textContent=S.bgmOn?'🎵':'🔇';$('bgmBtn').style.opacity=S.bgmOn?1:.55}
+document.addEventListener('pointerdown',()=>{ac();if(S.bgmOn&&!bgmTimer)bgmStart()},{capture:true});
+document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
+let lastDemoK=-1;
 let demoId=0,demoT=0,flash={},failT=0;
-function startDemo(){const b=S.batch;if(!b||!b.clump)return;b.clump.step=0;demoId=b.clump.id;demoT=performance.now()+700;flash={};
+function startDemo(){const b=S.batch;if(!b||!b.clump)return;lastDemoK=-1;b.clump.step=0;demoId=b.clump.id;demoT=performance.now()+700;flash={};
   toast('✨ ダマが光るよ。<b>光った順番</b>に、おなじようにタップしてほぐしてね',null,2600)}
 function demoIdx(now,b){if(demoId!==b.clump.id)return -2;const e=now-demoT;if(e<0)return -1;const k=Math.floor(e/750);if(k>=b.clump.order.length){return 99}
   return (e%750)<520?b.clump.order[k]:-1}
@@ -523,6 +554,7 @@ function drawClumps(b){
   if(!b.clump)return;const now=performance.now();
   if(demoId!==b.clump.id)startDemo();
   const di=demoIdx(now,b);
+  {const e=now-demoT,k=Math.floor(e/750);if(demoId===b.clump.id&&e>=0&&k<b.clump.order.length&&k!==lastDemoK&&(e%750)<520){lastDemoK=k;playNote(b.clump.order[k])}}
   b.clump.pos.forEach((p,i)=>{const wob=now<failT?Math.sin(now/30)*3:0;
     const x=p.x*W+wob,y=p.y*H,lit=di===i||(flash[i]&&now<flash[i]);
     const P=[];for(let k=0;k<10;k++){const a=k/10*Math.PI*2,rr=(lit?29:26)+Math.sin(k*2.3+p.r)*4;P.push([x+Math.cos(a)*rr,y+Math.sin(a)*rr*.78])}
@@ -635,11 +667,11 @@ function tapClump(px,py){
   const i=b.clump.pos.findIndex(p=>Math.hypot(p.x*W-px,(p.y*H-py)/.78)<32);if(i<0)return false;
   const now=performance.now(),di=demoIdx(now,b);
   if(di!==99){if(di!==-2)toast('光るのを見ててね👀',null,1200);return true}
-  flash[i]=now+300;
+  flash[i]=now+300;playNote(i);
   if(b.clump.order[b.clump.step]===i){b.clump.step++;
     for(let k=0;k<5;k++)parts.push({x:b.clump.pos[i].x*W,y:b.clump.pos[i].y*H,vx:(Math.random()-.5)*2,vy:-1-Math.random(),l:1,k:'air'});
-    if(b.clump.step>=b.clump.order.length){b.clump.pos.forEach(p=>{for(let k=0;k<8;k++)parts.push({x:p.x*W,y:p.y*H,vx:(Math.random()-.5)*3,vy:-1-Math.random()*1.5,l:1,k:'air'})});finishClump(b)}}
-  else{failT=now+500;b.clump.step=0;toast('あれ、ちがったみたい。もう一回光るから見ててね',null,2000);setTimeout(()=>{demoId=0},900)}
+    if(b.clump.step>=b.clump.order.length){setTimeout(playClear,350);b.clump.pos.forEach(p=>{for(let k=0;k<8;k++)parts.push({x:p.x*W,y:p.y*H,vx:(Math.random()-.5)*3,vy:-1-Math.random()*1.5,l:1,k:'air'})});finishClump(b)}}
+  else{failT=now+500;b.clump.step=0;setTimeout(playBoo,120);toast('あれ、ちがったみたい。もう一回光るから見ててね',null,2000);setTimeout(()=>{demoId=0},900)}
   save();ui();return true}
 function finishClump(b){const m=mood(b.temp),timing=b.clump.timing;b.clump=null;
   for(let i=0;i<18;i++)parts.push({x:W*(.1+Math.random()*.8),y:H*(.4+Math.random()*.5),vx:(Math.random()-.5)*.6,vy:-1-Math.random()*1.2,l:1,k:'air'});
@@ -956,7 +988,9 @@ function drawSeason(t){
 
 // ---------- boot ----------
 resize();
-seasonUI();
+seasonUI();bgmUI();
+$('bgmBtn').onclick=()=>{S.bgmOn=!S.bgmOn;save();bgmUI();if(S.bgmOn)bgmStart();else bgmStop()};
+
 if(!S.batch){pickUI();$('newOv').hidden=false}
 else{report(catchUp());spawnTinies()}
 ui();

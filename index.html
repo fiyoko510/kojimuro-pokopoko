@@ -71,6 +71,13 @@ body.mini #tval{font-size:14px}
 body.mini .btns{margin-top:6px;gap:6px}
 body.mini .b{padding:6px 4px;font-size:14px}body.mini .b small{display:none}
 body.mini #ff,body.mini #sw{display:none!important}
+#foot{margin:22px 4px 8px;padding-top:14px;border-top:1px dashed #cfe3e8;text-align:center;font-size:12px;line-height:1.7;color:var(--ink)}
+#foot a{color:var(--teal);font-weight:700;word-break:break-all}
+#foot .flink{font-weight:900;font-size:14px;margin-bottom:10px}
+#foot .fcredit{opacity:.8;margin-bottom:8px}
+#foot .fnote{opacity:.6;font-size:11px;text-align:left;margin-bottom:10px}
+#foot .fcopy{opacity:.7;font-size:11px}
+body.mini #foot{display:none}
 #ff{display:block;margin:12px auto 0;border:0;background:none;font:inherit;font-size:12px;color:var(--ink);opacity:.5;text-decoration:underline}
 .ov{position:fixed;inset:0;background:rgba(243,249,251,.95);display:flex;align-items:center;justify-content:center;z-index:10;padding:14px}
 .ov[hidden]{display:none}
@@ -152,6 +159,20 @@ body.mini #ff,body.mini #sw{display:none!important}
   </div>
   <button id="ff">⏩ 試作用：1時間すすめる</button>
   <button id="sw" style="display:block;margin:4px auto 0;border:0;background:none;font:inherit;font-size:12px;color:var(--ink);opacity:.5;text-decoration:underline">🔄 試作用：季節をかえる</button>
+  <footer id="foot">
+    <div class="flink">🌾 こうじむろ ぽこぽこ<br><a href="https://fiyoko510.github.io/kojimuro-pokopoko/" target="_blank" rel="noopener">fiyoko510.github.io/kojimuro-pokopoko/</a>
+      <button id="copyLink" class="chip" style="margin-top:6px">🔗 リンクをコピー</button></div>
+    <div class="fcredit">
+      企画・キャラクター原画：フィヨコ（TRiDESA）<br>
+      こうじちゃんの表情差分：Canvaで作成し、フィヨコが調整<br>
+      制作サポート：Claude（Anthropic）
+    </div>
+    <div class="fnote">
+      ※ゲーム内の麹の知識は、楽しく学ぶための目安です。実際の麹づくりや食品の扱いは、専門の資料をご確認ください。<br>
+      ※セーブデータはお使いのブラウザにだけ保存され、外部には送信されません。
+    </div>
+    <div class="fcopy">© 2026 TRiDESA / フィヨコ　All rights reserved.<br>イラスト・文章・画像の無断転載・二次配布はご遠慮ください。</div>
+  </footer>
 </div>
 
 <div id="toast"></div>
@@ -989,6 +1010,7 @@ function drawSeason(t){
 // ---------- boot ----------
 resize();
 seasonUI();bgmUI();
+$('copyLink').onclick=async()=>{const u='https://fiyoko510.github.io/kojimuro-pokopoko/';try{await navigator.clipboard.writeText(u);toast('🔗 リンクをコピーしたよ',null,1800)}catch(e){toast('コピーできなかったよ。上のURLを長押ししてコピーしてね',null,2500)}};
 $('bgmBtn').onclick=()=>{S.bgmOn=!S.bgmOn;save();bgmUI();if(S.bgmOn)bgmStart();else bgmStop()};
 
 if(!S.batch){pickUI();$('newOv').hidden=false}

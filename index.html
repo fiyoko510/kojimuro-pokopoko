@@ -162,6 +162,7 @@ body.mini #ff,body.mini #sw{display:none!important}
     <p>麹室で、こうじちゃんを育てよう。アプリを閉じていても、麹は時間とともに育っていくよ。</p>
     <ul>
       <li>ときどき開いて<b>温度</b>を見てね。32〜40℃がごきげん。</li>
+      <li><b>できばえ</b>は★3からスタート。ごきげんな温度で育てたり、ダマをほぐしたりすると上がって、暑すぎ・カビ菌・ダマの放置で下がるよ。</li>
       <li>麹菌は育つと<b>自分で熱を出す</b>よ。麹に<b>ダマ</b>ができたら、<b>光った順番</b>にタップしてほぐしてね（手入れ）。</li>
       <li>寒いときは「<b>布をかける</b>」で保温。</li>
             <li>大きい<b>こうじちゃんをタップ</b>すると、麹のまめちしきを話してくれるよ（なかよし度も上がるよ）。</li>
@@ -313,7 +314,7 @@ function simStep(b,h){ // h hours
   {const d=b.molds.length*2.5*h;b.q-=d;b.loss.mold+=d}
   if(b.temp<28)b.loss.cold+=h;
   b.q=Math.max(5,b.q);
-  if(m==='good')b.goodH+=h;
+  if(m==='good'){b.goodH+=h;if(!b.molds.length&&!b.clump)b.q=Math.min(100,b.q+2.5*h)}
   const pm=(m==='good'?0.05:0.3)*(b.covered&&m==='hot'?1.5:1)*se.mold*((b.cleanH||0)>0?.15:1)*(b.type===KURO?.5:1);
   b.cleanH=Math.max(0,(b.cleanH||0)-h);
   const CL=[.28,.52,.74];
@@ -527,7 +528,7 @@ function ui(){
   $('tbar').style.width=pct(b.temp)+'%';$('tbar').style.background=m==='hot'?'var(--hot)':m==='cold'?'var(--cold)':'var(--warm)';
   $('tval').textContent=b.temp.toFixed(1)+'℃';$('tval').style.color=m==='hot'?'var(--hot)':m==='cold'?'var(--cold)':'';
   $('gbar').style.width=(b.g*100)+'%';$('gval').textContent=Math.floor(b.g*100)+'%';
-  const st=Math.max(1,Math.round(b.q/20));$('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='#f2b84b';
+  const st=Math.max(1,Math.round(b.q/20));if(b.lastSt&&st!==b.lastSt)toast(st>b.lastSt?`⭐ できばえアップ！ ★${st}になったよ`:`できばえが★${st}に下がっちゃった…`,null,2500);b.lastSt=st;$('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='#f2b84b';
   const el=(Date.now()-b.start)/3.6e6;
   const left=(1-b.g)*DUR;
   $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;
@@ -565,7 +566,7 @@ function tapClump(px,py){
   save();ui();return true}
 function finishClump(b){const m=mood(b.temp),timing=b.clump.timing;b.clump=null;
   for(let i=0;i<18;i++)parts.push({x:W*(.1+Math.random()*.8),y:H*(.4+Math.random()*.5),vx:(Math.random()-.5)*.6,vy:-1-Math.random()*1.2,l:1,k:'air'});
-  if(timing){b.cd=(b.cd||0)+1;b.q=Math.min(100,b.q+6);b.temp=Math.max(ROOM+1,b.temp-(m==='hot'?5:2.5));
+  if(timing){b.cd=(b.cd||0)+1;b.q=Math.min(100,b.q+8);b.temp=Math.max(ROOM+1,b.temp-(m==='hot'?5:2.5));
     const nm=['切り返し','仲仕事','仕舞仕事'][b.cd-1];
     toast(`✨ ナイス手入れ！ かたまりがほぐれて、空気が入ったよ。できばえアップ（本物の麹づくりでいう「${nm}」みたいな作業だよ）`,null,4500);
     toast(TIPS[5].t,'hogusu');toast('本物の麹づくりでも、ほぐす手入れは約2日のあいだに<b>2〜4回くらい</b>。育ち具合を見てタイミングよく行うよ。','teire');}
@@ -639,7 +640,7 @@ function pickUI(){
   list.forEach(t=>{const bt=document.createElement('button');const c=document.createElement('canvas');c.width=60;c.height=36;const g=c.getContext('2d');
     [[18,18],[30,14],[42,20],[26,24],[38,26]].forEach(([x,y],i)=>grain(g,t,x,y,1,i));
     bt.appendChild(c);bt.insertAdjacentHTML('beforeend',KOJI[t].n+`<small>${KOJI[t].raw}でつくる</small>`);
-    bt.onclick=()=>{S.batch={type:t,start:Date.now(),last:Date.now(),g:0,temp:30,q:100,covered:false,molds:[],goodH:0,sat:0,shape:'normal',cd:0,cleanH:0};save();grains=null;$('newOv').hidden=true;toast(TIPS[0].t,'name');toast(TIPS[1].t,'eat');setTimeout(spawnTinies,600);ui()};
+    bt.onclick=()=>{S.batch={type:t,start:Date.now(),last:Date.now(),g:0,temp:30,q:60,covered:false,molds:[],goodH:0,sat:0,shape:'normal',cd:0,cleanH:0};save();grains=null;$('newOv').hidden=true;toast(TIPS[0].t,'name');toast(TIPS[1].t,'eat');setTimeout(spawnTinies,600);ui()};
     $('pick').appendChild(bt)});
 }
 let finishing=false;

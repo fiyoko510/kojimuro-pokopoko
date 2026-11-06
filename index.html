@@ -180,6 +180,7 @@ body.mini #ff,body.mini #sw{display:none!important}
 <div class="ov" id="doneOv" hidden>
   <div class="sheet">
     <h2 id="doneTitle"></h2>
+    <canvas id="doneCv" style="display:block;width:100%;border-radius:16px;margin:4px 0 8px"></canvas>
     <p id="doneTxt"></p>
     <div class="tip" id="doneUse"></div>
     <button class="big" id="doneNext">つぎの麹をしこむ</button>
@@ -307,8 +308,10 @@ function simStep(b,h){ // h hours
   const m=mood(b.temp);
   const rate=m==='good'?1:m==='cold'?(b.temp<28?0.15:0.45):(b.temp>44?0:0.3);
   b.g=Math.min(1,b.g+rate*h/DUR);
-  if(b.temp>HI+1)b.q-= (b.temp>44?14:5)*h;
-  b.q-=b.molds.length*2.5*h;
+  b.loss=b.loss||{hot:0,mold:0,clump:0,cold:0};
+  if(b.temp>HI+1){const d=(b.temp>44?14:5)*h;b.q-=d;b.loss.hot+=d}
+  {const d=b.molds.length*2.5*h;b.q-=d;b.loss.mold+=d}
+  if(b.temp<28)b.loss.cold+=h;
   b.q=Math.max(5,b.q);
   if(m==='good')b.goodH+=h;
   const pm=(m==='good'?0.05:0.3)*(b.covered&&m==='hot'?1.5:1)*se.mold*((b.cleanH||0)>0?.15:1)*(b.type===KURO?.5:1);
@@ -316,7 +319,7 @@ function simStep(b,h){ // h hours
   const CL=[.28,.52,.74];
   if(!b.clump&&(b.cd||0)<3&&b.g>=CL[b.cd||0])makeClump(b,true);
   if(!b.clump&&b.temp>HI+1){b.hotH=(b.hotH||0)+h;if(b.hotH>.3)makeClump(b,false)}else if(!b.clump)b.hotH=0;
-  if(b.clump){b.clumpH+=h;if(b.clumpH>1.5)b.q-=3*h}
+  if(b.clump){b.clumpH+=h;if(b.clumpH>1.5){b.q-=3*h;b.loss.clump+=3*h}}
   if(b.molds.length<5&&Math.random()<pm*h)addMold(b);
   b.sat=Math.max(0,b.sat-h);
 }
@@ -640,15 +643,47 @@ function pickUI(){
     $('pick').appendChild(bt)});
 }
 let finishing=false;
+const VERDICT={
+ good:{t:'りっぱな麹',d:'白い菌糸が全体をふわっとおおって、麹の花がさいたよ。栗みたいな甘い香りがしそう。'},
+ hot:{t:'育ちすぎた麹',d:'熱くなりすぎて、麹菌が<b>胞子</b>をつけはじめたよ。黄緑っぽいのは麹菌の胞子の色。腐ってはいないけど、香りや酵素のバランスがくずれやすいんだ。'},
+ mold:{t:'雑菌が入った麹',d:'カビ菌がくっついたままで、色がくすんでしまったよ。本物なら、黒や青緑・ピンクのカビが生えた麹は食べずに処分するのが基本。'},
+ clump:{t:'むれた麹',d:'ダマをほぐさなかったから、中に熱と湿気がこもって、べちゃっとかたまっちゃった。育ちにムラがあるよ。'},
+ cold:{t:'育ちが足りない麹',d:'寒い時間が長くて、菌糸が表面にうっすらついただけ。芯がかたくて、甘みを生む酵素も少なめだよ。'}};
+function verdictOf(b,st){if(st>=4)return'good';const L=b.loss||{};
+  const c=[['mold',L.mold||0],['hot',L.hot||0],['clump',L.clump||0],['cold',(L.cold||0)*4]].sort((a,b)=>b[1]-a[1]);return c[0][1]>0?c[0][0]:'good'}
+function drawResult(cv2,type,v){
+  const w=cv2.parentElement.clientWidth-32||300,h=Math.round(w*.6),d=Math.min(2,devicePixelRatio||1);
+  cv2.width=w*d;cv2.height=h*d;cv2.style.height=h+'px';const c=cv2.getContext('2d');c.setTransform(d,0,0,d,0,0);
+  const bg=c.createLinearGradient(0,0,0,h);bg.addColorStop(0,'#fdf6e7');bg.addColorStop(1,'#f2e3c6');c.fillStyle=bg;c.fillRect(0,0,w,h);
+  // wooden masu
+  c.fillStyle='#e2c08a';c.beginPath();c.roundRect(w*.08,h*.18,w*.84,h*.74,14);c.fill();c.fillStyle='#f6e6c6';c.beginPath();c.roundRect(w*.11,h*.23,w*.78,h*.64,10);c.fill();
+  let sd=type*97+7;const R=()=>(sd=sd*16807%2147483647)/2147483647;
+  const fl={good:'#fffefb',hot:'#dfe6a2',mold:'#c9c7b8',clump:'#f3ead6',cold:'#fffefb'}[v];
+  const cov={good:1,hot:1,mold:.8,clump:.7,cold:.3}[v];
+  const n=type===BEAN?70:150;const pts=[];
+  for(let i=0;i<n;i++){let x=w*(.14+R()*.72),y=h*(.27+R()*.56);
+    if(v==='clump'){const cxs=[[.3,.45],[.55,.6],[.72,.4],[.4,.72]][i%4];x=w*cxs[0]+(R()-.5)*w*.16;y=h*cxs[1]+(R()-.5)*h*.2}
+    pts.push([x,y,R()*3,.9+R()*.4])}
+  pts.sort((a,b)=>a[1]-b[1]);
+  pts.forEach(([x,y,a,s0])=>{grain(c,type,x,y,s0*1.1,a);
+    if(R()<cov){c.globalAlpha=v==='cold'?.45:.92;c.fillStyle=fl;c.beginPath();for(let k=0;k<7;k++){const an=k/7*Math.PI*2,rr=(v==='cold'?4:7)*s0;c.moveTo(x+Math.cos(an)*rr+3,y+Math.sin(an)*rr);c.arc(x+Math.cos(an)*rr,y+Math.sin(an)*rr,3*s0,0,7)}c.moveTo(x+6*s0,y);c.arc(x,y,6*s0,0,7);c.fill();c.globalAlpha=1}});
+  if(v==='hot'){c.fillStyle='rgba(150,170,60,.55)';for(let i=0;i<120;i++){c.beginPath();c.arc(w*(.14+R()*.72),h*(.27+R()*.56),1.4,0,7);c.fill()}}
+  if(v==='mold'){[['#5a6b55',9],['#2f3a3a',6],['#d9a0b0',5]].forEach(([col,k])=>{for(let i=0;i<k;i++){const x=w*(.16+R()*.68),y=h*(.3+R()*.5);c.fillStyle=col;c.globalAlpha=.75;for(let j=0;j<8;j++){c.beginPath();c.arc(x+(R()-.5)*14,y+(R()-.5)*10,3+R()*3,0,7);c.fill()}c.globalAlpha=1}})}
+  if(v==='clump'){c.fillStyle='rgba(170,140,90,.1)';[[.3,.45],[.55,.6],[.72,.4],[.4,.72]].forEach(([a,b2])=>{c.beginPath();c.ellipse(w*a,h*b2,w*.1,h*.12,0,0,7);c.fill()})}
+  if(v==='good'){c.fillStyle='rgba(255,220,120,.9)';c.font='bold 16px sans-serif';[[.15,.15],[.82,.12],[.9,.5],[.06,.6]].forEach(([a,b2])=>c.fillText('✦',w*a,h*b2))}
+  // koji-chan
+  const kr=h*.17,kx=w*.84,ky=h*.2;fluffy(c,kx,ky,kr,v==='good'?'#fffdf8':v==='hot'?'#f2f5d8':'#f4f1ea');
+  face(c,kx,ky+3,kr*.72,v==='good'?'joy':v==='cold'?'cold':'sad');
+}
 function finish(){
   if(finishing)return;finishing=true;
-  const b=S.batch;const st=Math.max(1,Math.round(b.q/20));
-  S.done.push({type:b.type,stars:st,date:Date.now()});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();
-  $('doneTitle').textContent=`🌸 ${KOJI[typ].n}ができた！`;
-  $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:16px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span><br>白い菌糸がふわふわに広がって、麹の花がさいたよ。`;
-  $('doneUse').innerHTML='🍶 '+KOJI[typ].use+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
+  const b=S.batch;const st=Math.max(1,Math.round(b.q/20));const v=verdictOf(b,st);
+  S.done.push({type:b.type,stars:st,date:Date.now(),v});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();
+  $('doneTitle').textContent=v==='good'?`🌸 ${KOJI[typ].n}ができた！`:`${KOJI[typ].n}ができた…`;
+  $('doneOv').hidden=false;drawResult($('doneCv'),typ,v);
+  $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:16px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>　<b>${VERDICT[v].t}</b><br>${VERDICT[v].d}`;
+  $('doneUse').innerHTML='🍶 '+KOJI[typ].use+(st<=2?'<br>🌱 ★2以下の麹は、💗こうかん所で<b>畑のぼかし肥料</b>にできるよ。':'')+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
   toast(TIPS[14].t,'master');toast(TIPS[13].t,'kinds');toast(TIPS[12].t,'quality');
-  $('doneOv').hidden=false;
 }
 $('doneNext').onclick=()=>{$('doneOv').hidden=true;finishing=false;pickUI();$('newOv').hidden=false};
 
@@ -661,10 +696,11 @@ const RECIPES=[
  {id:'komemiso',ic:'🥣',n:'米みそ',need:{1:1},cost:100,txt:'蒸した大豆をつぶして、<b>米麹と塩</b>をまぜて熟成させるよ。数か月〜1年くらいかけて、ゆっくり味が育つんだ。'},
  {id:'mugimiso',ic:'🥣',n:'麦みそ',need:{2:1},cost:100,txt:'大豆に<b>麦麹と塩</b>をまぜて熟成させるよ。九州や中国・四国地方でよく食べられている、甘めで香りのいいみそ。'},
  {id:'mamemiso',ic:'🟤',n:'豆みそ',need:{3:1},cost:100,txt:'<b>大豆を麹にした豆麹</b>と塩でつくるよ。愛知の八丁みそが有名で、1年以上じっくり熟成させるものもあるんだ。'},
+ {id:'bokashi',ic:'🌱',n:'ぼかし肥料',need:{bad:1},cost:0,txt:'うまく育たなかった麹も、むだにはならないよ。米ぬかや油かすとまぜて発酵させる<b>ぼかし肥料</b>の材料になるんだ。発酵させてから使うのがポイント。生のまま土にたくさん入れると、分解するときにガスや熱が出たり、虫が寄ってきたりするよ。'},
  {id:'shoyu',ic:'🫗',n:'醤油',need:{3:1,2:1},cost:150,txt:'醤油の麹は<b>大豆と小麦</b>でつくるよ。塩水とまぜた「もろみ」を、<b>半年〜1年以上</b>かけて熟成させてしぼるんだ。'},
 ];
-const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-const EN={1:'KOME-KOJI',2:'MUGI-KOJI',3:'MAME-KOJI',4:'KURO-KOJI',amazake:'AMAZAKE',shio:'SHIO-KOJI',tamanegi:'TAMANEGI-KOJI',shoyukoji:'SHOYU-KOJI',komemiso:'KOME-MISO',mugimiso:'MUGI-MISO',mamemiso:'MAME-MISO',shoyu:'SHOYU'};
+const ROMAN=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII'];
+const EN={1:'KOME-KOJI',2:'MUGI-KOJI',3:'MAME-KOJI',4:'KURO-KOJI',amazake:'AMAZAKE',shio:'SHIO-KOJI',tamanegi:'TAMANEGI-KOJI',shoyukoji:'SHOYU-KOJI',komemiso:'KOME-MISO',mugimiso:'MUGI-MISO',mamemiso:'MAME-MISO',shoyu:'SHOYU',bokashi:'BOKASHI'};
 function cards(){
   const c=[];
   [[1,'🌾'],[2,'🌿'],[3,'🫘'],[4,'⚫']].forEach(([t,ic])=>c.push({key:t,ic,n:KOJI[t].n,kind:'koji',own:S.done.filter(x=>x.type===t).length,txt:KOJI[t].use}));
@@ -676,14 +712,15 @@ function cardHTML(c,big){
   return `<div class="tc ${c.kind}${big?' big':''}" data-k="${c.key}"><div class="tn">${c.no}</div><div class="arch"><span>${c.ic}</span></div><div class="tname">${c.n}</div><div class="tsub">${EN[c.key]}</div>${c.own>1&&!big?`<span class="cnt">×${c.own}</span>`:''}</div>`;
 }
 const UNLOCKS=[{id:'kuro',ic:'⚫',n:'黒麹菌',cost:200,txt:'黒い胞子の麹菌。焼酎や泡盛に使われるよ。クエン酸をたくさん出すから雑菌に強く、カビ菌が来にくいよ。'}];
-function stock(t){return S.done.filter(x=>x.type===t&&!x.used).length}
+function isNeed(x,t){return t==='bad'?x.stars<=2:x.type===+t}
+function stock(t){return S.done.filter(x=>isNeed(x,t)&&!x.used).length}
 function shopUI(){
   $('shopHearts').textContent='♡'+(S.hearts||0);
   let h='<div class="sec">🫙 麹をしこむ（麹だなの麹を使うよ）</div>';
-  h+=RECIPES.map(r=>{const needTxt=Object.entries(r.need).map(([t,n])=>`${KOJI[t].n}${n>1?'×'+n:''}`).join('＋');
-    const ok=(S.hearts||0)>=r.cost&&Object.entries(r.need).every(([t,n])=>stock(+t)>=n);
+  h+=RECIPES.map(r=>{const needTxt=Object.entries(r.need).map(([t,n])=>`${t==='bad'?'★2以下の麹':KOJI[t].n}${n>1?'×'+n:''}`).join('＋');
+    const ok=(S.hearts||0)>=r.cost&&Object.entries(r.need).every(([t,n])=>stock(t)>=n);
     const made=S.items.filter(x=>x===r.id).length;
-    return `<div class="row2"><div class="ic">${r.ic}</div><div class="tx"><b>${r.n}</b>${made?` <span style="opacity:.6">（${made}こ）</span>`:''}<br>${needTxt}＋♡${r.cost}</div><button data-r="${r.id}" ${ok?'':'disabled'}>しこむ</button></div>`}).join('');
+    return `<div class="row2"><div class="ic">${r.ic}</div><div class="tx"><b>${r.n}</b>${made?` <span style="opacity:.6">（${made}こ）</span>`:''}<br>${needTxt}${r.cost?'＋♡'+r.cost:'（ハートいらず）'}</div><button data-r="${r.id}" ${ok?'':'disabled'}>しこむ</button></div>`}).join('');
   h+='<div class="sec">🌱 新しい麹菌</div>';
   h+=UNLOCKS.map(u=>{const has=S.unlock.includes(u.id);return `<div class="row2"><div class="ic">${u.ic}</div><div class="tx"><b>${u.n}</b><br>${has?'こうかんずみ！次の仕込みで選べるよ':'♡'+u.cost}</div><button data-u="${u.id}" ${has||(S.hearts||0)<u.cost?'disabled':''}>${has?'もってる':'こうかん'}</button></div>`}).join('');
   $('shopList').innerHTML=h;
@@ -691,7 +728,7 @@ function shopUI(){
   $('shopList').querySelectorAll('[data-u]').forEach(bt=>bt.onclick=()=>unlock(bt.dataset.u));
 }
 function craft(id){const r=RECIPES.find(x=>x.id===id);
-  Object.entries(r.need).forEach(([t,n])=>{for(let i=0;i<n;i++){const k=S.done.find(x=>x.type===+t&&!x.used);if(k)k.used=id}});
+  Object.entries(r.need).forEach(([t,n])=>{for(let i=0;i<n;i++){const k=S.done.filter(x=>isNeed(x,t)&&!x.used).sort((a,b)=>a.stars-b.stars)[0];if(k)k.used=id}});
   S.hearts-=r.cost;S.items.push(id);save();shopUI();ui();
   const c=cards().find(x=>x.key===id);$('madeIcon').innerHTML=cardHTML(c,true);$('madeTitle').textContent=`${r.n}をしこんだよ！`;
   $('madeTxt').innerHTML='📖 '+r.txt+'<br><br>🏺 カードは<b>麹だな</b>にかざったよ。右上の🏺からいつでも見られるよ。';$('madeOv').hidden=false}

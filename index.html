@@ -129,6 +129,29 @@ body.mini #foot{display:none}
 .flipin .tc{animation:flip .8s ease-out}
 @keyframes flip{0%{transform:perspective(600px) rotateY(180deg) scale(.7);opacity:0}60%{opacity:1}100%{transform:perspective(600px) rotateY(0) scale(1)}}
 #madeOv{z-index:12}
+.procCard{display:flex;align-items:center;gap:12px;width:100%;border:0;text-align:left;font:inherit;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#3cb8c8,#2a8e9b);border-radius:16px;padding:12px 14px;box-shadow:0 3px 0 #22737e}
+.procCard:active{transform:translateY(2px);box-shadow:none}
+.procCard .pcIc{font-size:28px}.procCard .pcTx{flex:1;line-height:1.4}.procCard b{font-size:16px;display:block}.procCard small{font-size:12px;opacity:.9}
+.procCard .pcGo{font-size:28px;font-weight:900;opacity:.8}
+.proc .procHead{background:linear-gradient(160deg,#fdf6e7,#f2e3c6);border-radius:14px;padding:14px;margin:-4px 0 12px}
+.proc .procKicker{font-family:Georgia,serif;letter-spacing:.2em;font-size:11px;color:#b08a4a}
+.proc .procHead h2{margin:2px 0 4px}.proc .procHead p{margin:0;font-size:13px}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl:before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:#d9e9ee}
+.tl li{position:relative;display:flex;gap:12px;margin-bottom:12px}
+.tlDot{flex:0 0 32px;height:32px;border-radius:50%;background:#fff;border:2px solid #9fd6de;color:#2a8e9b;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:1;font-size:14px}
+.tlBody{flex:1;background:#f3f9fb;border-radius:12px;padding:8px 11px}
+.tlTop{display:flex;justify-content:space-between;align-items:baseline;gap:6px;flex-wrap:wrap}
+.tlTop b{font-size:15px}.tlTime{font-size:12px;font-weight:900;color:#e08a3c;white-space:nowrap}
+.tlBody p{margin:4px 0 0;font-size:13px;line-height:1.65}
+.tl li.game .tlDot{background:#f6a96b;border-color:#f6a96b;color:#fff;box-shadow:0 0 0 5px rgba(246,169,107,.25)}
+.tl li.game .tlBody{background:#fff6e8;box-shadow:inset 0 0 0 2px #f6c69a}
+.gameTag{margin-top:8px;background:#fff;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700;line-height:1.55}
+.gameTag small{font-weight:500;opacity:.85}
+.src{margin-top:4px;font-size:12px}.src summary{cursor:pointer;opacity:.7}
+.src a{display:block;color:var(--teal);margin:4px 0 0 4px}.src small{display:block;opacity:.6;margin-top:6px}
+#procOv{z-index:12}
 .sec{font-size:13px;font-weight:900;opacity:.6;margin:12px 0 2px}
 .col{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .col span{background:#f3f9fb;border-radius:10px;padding:4px 8px;font-size:13px}
@@ -213,7 +236,8 @@ body.mini #foot{display:none}
 <div class="ov" id="noteOv" hidden>
   <div class="sheet">
     <h2>📖 麹のまめちしきノート</h2>
-    <p style="font-size:13px;opacity:.7;margin-top:0">お世話をしているとページが増えていくよ。</p>
+    <button class="procCard" id="procBtn"><span class="pcIc">⏳</span><span class="pcTx"><b>麹ができるまで</b><small>洗米から出麹まで、全工程と時間をみてみよう</small></span><span class="pcGo">›</span></button>
+    <p style="font-size:13px;opacity:.7;margin-top:10px">お世話をしているとページが増えていくよ。</p>
     <div id="noteList"></div>
     <button class="big" data-close>とじる</button>
   </div>
@@ -235,6 +259,30 @@ body.mini #foot{display:none}
     <h2 id="madeTitle"></h2>
     <div class="tip" id="madeTxt" style="text-align:left"></div>
     <button class="big" data-close>やったね！</button>
+  </div>
+</div>
+
+<div class="ov" id="procOv" hidden>
+  <div class="sheet proc">
+    <div class="procHead"><div class="procKicker">KOME-KOJI</div><h2>⏳ 米麹ができるまで</h2><p>お米が麹になるまでには、ぜんぶで<b>およそ2〜3日</b>かかるよ。</p></div>
+    <ol class="tl">
+      <li><span class="tlDot">1</span><div class="tlBody"><div class="tlTop"><b>洗米・浸水</b><span class="tlTime">約6〜15時間</span></div><p>お米をやさしく洗って、芯までしっかり水を吸わせるよ。冬は長め、夏は短め。</p></div></li>
+      <li><span class="tlDot">2</span><div class="tlBody"><div class="tlTop"><b>水切り</b><span class="tlTime">約1〜3時間</span></div><p>ザルにあげて、よぶんな水をしっかり切る。ここが甘いと、ベタついた麹になっちゃう。</p></div></li>
+      <li><span class="tlDot">3</span><div class="tlBody"><div class="tlTop"><b>米蒸し</b><span class="tlTime">約40分〜1時間</span></div><p>外はパラッと、中はもちっとした「<b>外硬内軟</b>」に蒸しあげるよ。</p></div></li>
+      <li><span class="tlDot">4</span><div class="tlBody"><div class="tlTop"><b>冷却・種付け（種切り）</b><span class="tlTime">約15〜30分</span></div><p>蒸し米を40℃くらいまで冷まして、種麹（麹菌）をまんべんなくふりかけてまぜる。</p></div></li>
+      <li class="game"><span class="tlDot">5</span><div class="tlBody"><div class="tlTop"><b>発酵・保温</b><span class="tlTime">約42〜50時間</span></div><p>30〜40℃くらいの温度と湿度をたもって、麹菌をふやすよ。とちゅうで何回か、お米をほぐして温度をそろえる「<b>手入れ</b>」（切り返し・盛りなど）をするんだ。</p>
+        <div class="gameTag">🎮 こうじむろ ぽこぽこで遊んでいるのは、この工程！<br><small>温度を見て布をかけたりとったり、ダマをほぐしたり、カビ菌をおいはらったり。ゲームでは時間を短くして、ごきげんな温度なら約10時間で育つよ。50時間たつと、育ち具合にかかわらず「出麹」になるよ。</small></div></div></li>
+      <li><span class="tlDot">6</span><div class="tlBody"><div class="tlTop"><b>完成（出麹）</b><span class="tlTime">🌸</span></div><p>お米ぜんたいが白い綿のような菌糸におおわれて、板のようにかたまったらできあがり。</p></div></li>
+    </ol>
+    <details class="src"><summary>参考にしたページ</summary>
+      <a href="https://kawashima-ya.jp/contents/?p=459" target="_blank" rel="noopener">かわしまや</a>
+      <a href="https://shop.yamato-soysauce-miso.co.jp/blog/2021/12/07/kouji/" target="_blank" rel="noopener">ヤマト醤油味噌</a>
+      <a href="https://kojiyamotomiya.com/knowledge/make-komekoji/" target="_blank" rel="noopener">糀屋本店（麹の作り方）</a>
+      <a href="https://nakasone-kojiya-shop.com/blogs/%E3%82%B3%E3%83%A9%E3%83%A0/komekoji-tsukurikata" target="_blank" rel="noopener">なかそね麹屋</a>
+      <a href="https://www.moyashi-koubou.com/blog/%E7%B1%B3%E9%BA%B9%E3%81%AE%E4%BD%9C%E3%82%8A%E6%96%B9/" target="_blank" rel="noopener">もやし工房</a>
+      <small>※時間は作り方や季節によって変わるよ。目安として見てね。</small>
+    </details>
+    <button class="big" id="procClose">ノートにもどる</button>
   </div>
 </div>
 
@@ -682,7 +730,7 @@ function ui(){
   const st=Math.max(1,Math.round(b.q/20));if(b.lastSt&&st!==b.lastSt)toast(st>b.lastSt?`⭐ できばえアップ！ ★${st}になったよ`:`できばえが★${st}に下がっちゃった…`,null,2500);b.lastSt=st;$('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='#f2b84b';
   const el=(Date.now()-b.start)/3.6e6;
   const left=(1-b.g)*DUR;
-  $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;{const slow=m==='hot'?(b.temp>44?'🔥 あつすぎて、育ちがとてもゆっくり（ふだんの約15%）。布をとって冷まそう':'🔥 あつくて、育ちがゆっくり（ふだんの約45%）'):m==='cold'?(b.temp<28?'❄️ さむくて、育ちがとてもゆっくり（ふだんの約25%）。布をかけよう':'❄️ ちょっとさむくて、育ちがゆっくり（ふだんの約50%）'):'';if(slow)$('meta').innerHTML+='<br><b>'+slow+'</b>'}
+  $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;{const slow=m==='hot'?(b.temp>44?'🔥 あつすぎて、育ちがとてもゆっくり（ふだんの約15%）。布をとって冷まそう':'🔥 あつくて、育ちがゆっくり（ふだんの約45%）'):m==='cold'?(b.temp<28?'❄️ さむくて、育ちがとてもゆっくり（ふだんの約25%）。布をかけよう':'❄️ ちょっとさむくて、育ちがゆっくり（ふだんの約50%）'):'';if(slow)$('meta').innerHTML+='<br><b>'+slow+'</b>'};{const rem=50-el;if(rem<10)$('meta').innerHTML+=`<br>⏳ 出麹まで（50時間）あと${rem<1?Math.max(1,Math.ceil(rem*60))+'分':rem.toFixed(1)+'時間'}`}
   const say=b.clump?'ダマができた〜 光った順にタップしてほぐして〜':b.molds.length?'なにかいる…！タップでとって〜':m==='hot'?(b.covered?'あつい〜布とって〜':'あつい〜もうすぐダマになりそう…'):m==='cold'?(b.covered?'ぬくぬく待ち…':'ちょっとさむい…布かけて'):b.g<.3?'菌糸、のばしてるよ':b.g<.7?'ぐんぐん育ちちゅう！':'もうすぐ麹の花がさくよ';
   if(Date.now()>talkUntil)$('bubble').textContent=say;
   $('clothBtn').innerHTML=b.covered?'🧺 布をとる<small>熱をこもらせない</small>':'🧺 布をかける<small>保温する</small>';
@@ -696,6 +744,7 @@ function ui(){
   if(b.g>.7)toast(TIPS[11].t,'time');
   if(b.molds.length)toast(TIPS[8].t,'mold');
   if(b.g>=1)finish();
+  else if((Date.now()-b.start)/3.6e6>=50)finish(true);
 }
 
 // ---------- actions ----------
@@ -828,11 +877,13 @@ function drawResult(cv2,type,v){
   // koji-chan
   const gh=h*.82;drawGirl(c,w-gh*.32-8,gh*.59+4,gh,performance.now()/1000,v==='good'?'joy':v==='cold'?'cold':'sad',v==='good'?'#fffdf8':v==='hot'?'#f2f5d8':'#f4f1ea');
 }
-function finish(){
+function finish(timeUp){
   if(finishing)return;finishing=true;
-  const b=S.batch;const st=Math.max(1,Math.round(b.q/20));const v=verdictOf(b,st);
+  const b=S.batch;const gf=Math.min(1,b.g);let st=Math.max(1,Math.round(b.q*(timeUp?Math.min(1,gf+.15):1)/20));if(timeUp&&gf<1)st=Math.min(st,3);
+  let v=verdictOf(b,st);if(timeUp&&gf<1&&v==='good')v='cold';
+  if(timeUp&&gf<1){const L=b.loss||{};v=(L.hot||0)>(L.cold||0)*4?'hot':'cold'}
   S.done.push({type:b.type,stars:st,date:Date.now(),v});S.hearts=(S.hearts||0)+20;const typ=b.type;S.batch=null;save();if(S.done.length>=3)setTimeout(()=>tip('enzyme100'),1500);
-  $('doneTitle').textContent=v==='good'?`🌸 ${KOJI[typ].n}ができた！`:`${KOJI[typ].n}ができた…`;
+  $('doneTitle').textContent=timeUp&&gf<1?`⏳ 50時間たったので出麹にしたよ`:v==='good'?`🌸 ${KOJI[typ].n}ができた！`:`${KOJI[typ].n}ができた…`;
   $('doneOv').hidden=false;drawResult($('doneCv'),typ,v);if(!GIRL.complete)GIRL.onload=()=>drawResult($('doneCv'),typ,v);
   $('doneTxt').innerHTML=`できばえ <span style="color:#f2b84b;font-size:17px">${'★'.repeat(st)+'☆'.repeat(5-st)}</span>　<b>${VERDICT[v].t}</b><br>${VERDICT[v].d}`;
   $('doneUse').innerHTML='🍶 '+KOJI[typ].use+(st<=2?'<br>🌱 ★2以下の麹は、💗こうかん所で<b>畑のぼかし肥料</b>にできるよ。':'')+'<br>💗 完成ボーナスで <b>♡+20</b>！ 💗こうかん所で麹をしこむと、カードになって🏺麹だなにかざられるよ。';
@@ -1031,6 +1082,8 @@ function drawSeason(t){
 // ---------- boot ----------
 resize();
 seasonUI();bgmUI();
+$('procBtn').onclick=()=>{$('procOv').hidden=false;$('procOv').querySelector('.sheet').scrollTop=0};
+$('procClose').onclick=()=>{$('procOv').hidden=true};
 $('copyLink').onclick=async()=>{const u='https://fiyoko510.github.io/kojimuro-pokopoko/';try{await navigator.clipboard.writeText(u);toast('🔗 リンクをコピーしたよ',null,1800)}catch(e){toast('コピーできなかったよ。上のURLを長押ししてコピーしてね',null,2500)}};
 $('bgmBtn').onclick=()=>{S.bgmOn=!S.bgmOn;save();bgmUI();if(S.bgmOn)bgmStart();else bgmStop()};
 

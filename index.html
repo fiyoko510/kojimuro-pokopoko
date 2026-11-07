@@ -336,10 +336,10 @@ function simStep(b,h){ // h hours
   const SH={mori:.55,normal:1,flat:1.6}[b.shape||'normal'];
   let k=(b.covered?0.14:se.k)*SH;
   if(b.clump)k*=.75;
-  b.temp+= (a*3.5 - k*(b.temp-ROOM))*h;
+  b.temp+= (a*3 - k*(b.temp-ROOM))*h;
   b.temp=Math.min(48,b.temp);
   const m=mood(b.temp);
-  const rate=m==='good'?1:m==='cold'?(b.temp<28?0.15:0.45):(b.temp>44?0:0.3);
+  const rate=m==='good'?1:m==='cold'?(b.temp<28?0.25:0.5):(b.temp>44?0.15:0.45);
   b.g=Math.min(1,b.g+rate*h/DUR);
   b.loss=b.loss||{hot:0,mold:0,clump:0,cold:0};
   if(b.temp>HI+1){const d=(b.temp>44?14:5)*h;b.q-=d;b.loss.hot+=d}
@@ -682,7 +682,7 @@ function ui(){
   const st=Math.max(1,Math.round(b.q/20));if(b.lastSt&&st!==b.lastSt)toast(st>b.lastSt?`⭐ できばえアップ！ ★${st}になったよ`:`できばえが★${st}に下がっちゃった…`,null,2500);b.lastSt=st;$('stars').textContent='★'.repeat(st)+'☆'.repeat(5-st);$('stars').style.color='#f2b84b';
   const el=(Date.now()-b.start)/3.6e6;
   const left=(1-b.g)*DUR;
-  $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;
+  $('meta').innerHTML=`${KOJI[b.type].n}をしこんで ${el<1?Math.round(el*60)+'分':el.toFixed(1)+'時間'}。ごきげんな温度なら、あと約${left<1?Math.ceil(left*60)+'分':left.toFixed(1)+'時間'}で完成。`;{const slow=m==='hot'?(b.temp>44?'🔥 あつすぎて、育ちがとてもゆっくり（ふだんの約15%）。布をとって冷まそう':'🔥 あつくて、育ちがゆっくり（ふだんの約45%）'):m==='cold'?(b.temp<28?'❄️ さむくて、育ちがとてもゆっくり（ふだんの約25%）。布をかけよう':'❄️ ちょっとさむくて、育ちがゆっくり（ふだんの約50%）'):'';if(slow)$('meta').innerHTML+='<br><b>'+slow+'</b>'}
   const say=b.clump?'ダマができた〜 光った順にタップしてほぐして〜':b.molds.length?'なにかいる…！タップでとって〜':m==='hot'?(b.covered?'あつい〜布とって〜':'あつい〜もうすぐダマになりそう…'):m==='cold'?(b.covered?'ぬくぬく待ち…':'ちょっとさむい…布かけて'):b.g<.3?'菌糸、のばしてるよ':b.g<.7?'ぐんぐん育ちちゅう！':'もうすぐ麹の花がさくよ';
   if(Date.now()>talkUntil)$('bubble').textContent=say;
   $('clothBtn').innerHTML=b.covered?'🧺 布をとる<small>熱をこもらせない</small>':'🧺 布をかける<small>保温する</small>';
